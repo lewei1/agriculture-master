@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbTransferMapper">
+
+    <resultMap type="TbTransfer" id="TbTransferResult">
+        <result property="transferId"    column="transfer_id"    />
+        <result property="inWarehouseId"    column="in_warehouse_id"    />
+        <result property="outWarehouseId"    column="out_warehouse_id"    />
+        <result property="number"    column="number"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="article"    column="article"    />
+        <result property="materialTypeId"    column="material_type_id"    />
+        <!--这个tpye要注意，数据库取名太简单了，映射名字不一样-->
+        <result property="materialTypeName"    column="type"    />
+        <result property="method"    column="method"    />
+        <result property="unit"    column="unit"    />
+        <result property="unitName" column="unit_name"/>
+        <result property="quantity"    column="quantity"    />
+        <result property="operate"    column="operate"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="status"    column="status"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="operatorName"    column="operator_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+
+	<sql id="selectTbTransferVo">
+        select transfer_id, in_warehouse_id, out_warehouse_id, number, material_id, article, type, method, unit, quantity, operate, remarks, status, operator_id, create_time, create_by, update_time, update_by, farm_id from tb_transfer
+    </sql>
+
+    <select id="selectTbTransferList" parameterType="TbTransfer" resultMap="TbTransferResult">
+        SELECT
+        tt.transfer_id,
+        tt.in_warehouse_id,
+        tt.out_warehouse_id,
+        tt.number,
+        tt.material_id,
+        tt.article,
+        tt.method,
+        tt.unit,
+        tut1.type_name as unit_name,
+        tt.quantity,
+        tt.operate,
+        tt.remarks,
+        tt.`STATUS`,
+        tt.operator_id,
+        vu.nick_name as operator_name,
+        tt.create_time,
+        tt.create_by,
+        tt.update_time,
+        tt.update_by,
+        tt.farm_id,
+        tat.material_type_id,
+        tat.type_name AS `type`
+        FROM
+        tb_transfer tt
+        LEFT JOIN tb_article ta ON ta.material_id = tt.material_id
+        LEFT JOIN tb_article_type tat ON ta.material_type_id = tat.material_type_id
+        LEFT JOIN tb_unit_type tut1 ON tt.unit = tut1.material_unit_id
+        LEFT JOIN vb_user vu ON vu.user_code = tt.operator_id and vu.farm_id = tt.farm_id
+        <where>
+            (tt.in_warehouse_id = #{inWarehouseId} or tt.out_warehouse_id = #{inWarehouseId})
+            <if test="materialId != null "> and tt.material_id = #{materialId}</if>
+            <if test="materialTypeId != null "> and tat.material_type_id = #{materialTypeId}</if>
+            <if test="article != null  and article != '' "> and (tt.number LIKE CONCAT('%',#{article},'%') or tt.article LIKE CONCAT('%',#{article},'%'))</if>
+            <if test="farmId != null  and farmId != '' "> and tt.farm_id = #{farmId}</if>
+         </where>
+        order by tt.create_time desc
+    </select>
+
+
+    <select id="selectTbTransferListByName" parameterType="TbTransfer" resultMap="TbTransferResult">
+        <include refid="selectTbTransferVo"/>
+        <where>
+            <if test="number != null  and number != '' "> and number LIKE CONCAT('%',#{number},'%')</if>
+            <if test="article != null  and article != '' "> and article LIKE CONCAT('%',#{article},'%')</if>
+            <if test="materialTypeName != null  and materialTypeName != '' "> and type = #{materialTypeName}</if>
+        </where>
+    </select>
+
+    <select id="selectTbTransferById" parameterType="TbTransfer" resultMap="TbTransferResult">
+        select tt.transfer_id, tt.in_warehouse_id, tt.out_warehouse_id, tt.number, tt.material_id, tt.article, tt.type, tt.method, tt.unit, tt.quantity, tt.operate, tt.remarks, tt.status,
+         tt.operator_id,
+         vu.nick_name as operator_name,
+         tt.create_time, tt.create_by, tt.update_time, tt.update_by, tt.farm_id
+        from tb_transfer tt
+        LEFT JOIN vb_user vu ON vu.user_code = tt.operator_id and vu.farm_id = tt.farm_id
+        where tt.transfer_id = #{transferId} and tt.farm_id = #{farmId}
+    </select>
+
+    <insert id="insertTbTransfer" parameterType="TbTransfer" useGeneratedKeys="true" keyProperty="transferId">
+        insert into tb_transfer
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inWarehouseId != null  ">in_warehouse_id,</if>
+			<if test="outWarehouseId != null  ">out_warehouse_id,</if>
+			<if test="number != null  and number != ''  ">number,</if>
+			<if test="materialId != null  ">material_id,</if>
+			<if test="article != null  and article != ''  ">article,</if>
+			<if test="materialTypeName != null  and materialTypeName != ''  ">type,</if>
+			<if test="method != null  and method != ''  ">method,</if>
+			<if test="unit != null ">unit,</if>
+			<if test="quantity != null  ">quantity,</if>
+			<if test="operatorId != null ">operator_id,</if>
+			<if test="remarks != null  and remarks != ''  ">remarks,</if>
+			<if test="status != null  ">status,</if>
+			<if test="operate != null  ">operate,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inWarehouseId != null  ">#{inWarehouseId},</if>
+			<if test="outWarehouseId != null  ">#{outWarehouseId},</if>
+			<if test="number != null  and number != ''  ">#{number},</if>
+			<if test="materialId != null  ">#{materialId},</if>
+			<if test="article != null  and article != ''  ">#{article},</if>
+			<if test="materialTypeName != null  and materialTypeName != ''  ">#{materialTypeName},</if>
+			<if test="method != null  and method != ''  ">#{method},</if>
+			<if test="unit != null ">#{unit},</if>
+			<if test="quantity != null  ">#{quantity},</if>
+			<if test="operatorId != null  ">#{operatorId},</if>
+			<if test="remarks != null  and remarks != ''  ">#{remarks},</if>
+			<if test="status != null  ">#{status},</if>
+			<if test="operate != null  ">#{operate},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTbTransfer" parameterType="TbTransfer">
+        update tb_transfer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inWarehouseId != null  ">in_warehouse_id = #{inWarehouseId},</if>
+            <if test="outWarehouseId != null  ">out_warehouse_id = #{outWarehouseId},</if>
+            <if test="number != null  and number != ''  ">number = #{number},</if>
+            <if test="materialId != null  ">material_id = #{materialId},</if>
+            <if test="article != null  and article != ''  ">article = #{article},</if>
+            <if test="materialTypeName != null  and materialTypeName != ''  ">type = #{materialTypeName},</if>
+            <if test="method != null  and method != ''  ">method = #{method},</if>
+            <if test="unit != null ">unit = #{unit},</if>
+            <if test="quantity != null  ">quantity = #{quantity},</if>
+            <if test="operatorId != null ">operator_id = #{operatorId},</if>
+            <if test="remarks != null  and remarks != ''  ">remarks = #{remarks},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="operate != null  ">operate = #{operate},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where transfer_id = #{transferId}
+    </update>
+
+	<delete id="deleteTbTransferById" parameterType="TbTransfer">
+        delete from tb_transfer where transfer_id = #{transferId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbTransferByIds" parameterType="String">
+        delete from tb_transfer where transfer_id in
+        <foreach item="transferId" collection="array" open="(" separator="," close=")">
+            #{transferId}
+        </foreach>
+    </delete>
+
+</mapper>

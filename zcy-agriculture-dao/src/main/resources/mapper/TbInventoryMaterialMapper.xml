@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbInventoryMaterialMapper">
+
+    <resultMap type="TbInventoryMaterial" id="TbInventoryMaterialResult">
+        <result property="warehouseMaterialId" column="warehouse_material_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="alarmStock" column="alarm_stock"/>
+        <result property="materialId" column="material_id"/>
+        <result property="warehouseId" column="warehouse_id"/>
+        <result property="farmId" column="farm_id"/>
+        <result property="materialName" column="material_name"/>
+        <result property="materialTypeId" column="material_type_id"/>
+        <result property="materialTypeName" column="material_type_name"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="price" column="price"/>
+        <result property="priceUnitName" column="price_unit_name"/>
+        <result property="unit" column="unit"/>
+        <result property="unitName" column="unit_name"/>
+        <result property="totalPrice" column="total_price"/>
+    </resultMap>
+
+    <sql id="selectTbInventoryMaterialVo">
+        select warehouse_material_id, quantity, alarm_stock, material_id, warehouse_id, farm_id from tb_inventory_material
+    </sql>
+
+    <select id="selectTbInventoryMaterialList" parameterType="TbInventoryMaterial"
+            resultMap="TbInventoryMaterialResult">
+        SELECT
+        tim.warehouse_material_id,
+        tim.quantity,
+        tim.alarm_stock,
+        tim.material_id,
+        tim.warehouse_id,
+        tim.farm_id,
+        ta.`material_name` AS material_name,
+        ta.material_type_id,
+        tat.type_name AS material_type_name,
+        tw.`name` AS warehouse_name,
+        ta.meter_unit_id as unit,
+        tut1.type_name as unit_name,
+        ta.price,
+        tut2.type_name as price_unit_name,
+--         CASE WHEN ta.price_unit_id is null THEN ta.price
+--         WHEN ta.price_unit_id=ta.unit_id1 THEN ROUND(ta.price/ta.conversion_ratio1,2)
+--         WHEN ta.price_unit_id=ta.unit_id2 THEN ROUND(ta.price/ta.conversion_ratio2,2) END AS price,
+        CASE WHEN ta.price_unit_id is null THEN tim.quantity * ta.price
+        WHEN ta.price_unit_id=ta.unit_id1 THEN ROUND(tim.quantity * (ta.price/ta.conversion_ratio1),2)
+        WHEN ta.price_unit_id=ta.unit_id2 THEN ROUND(tim.quantity * (ta.price/ta.conversion_ratio2),2) END AS total_price
+        FROM
+        tb_inventory_material tim
+        LEFT JOIN tb_article ta ON tim.material_id = ta.material_id
+        LEFT JOIN tb_article_type tat ON ta.material_type_id = tat.material_type_id
+        LEFT JOIN tb_warehouse tw ON tim.warehouse_id = tw.warehouse_id
+        LEFT JOIN tb_unit_type tut1 ON ta.meter_unit_id = tut1.material_unit_id
+        LEFT JOIN tb_unit_type tut2 ON ta.price_unit_id = tut2.material_unit_id
+        <where>
+            <if test="materialId != null ">and tim.material_id = #{materialId}</if>
+            <if test="warehouseId != null ">and tim.warehouse_id = #{warehouseId}</if>
+            <if test="farmId != null  and farmId != '' ">and tim.farm_id = #{farmId}</if>
+            <if test="materialTypeId != null ">and ta.material_type_id = #{materialTypeId}</if>
+            <if test="materialName != null  and materialName != '' ">and ta.`material_name` like concat('%', #{materialName},
+                '%')
+            </if>
+        </where>
+        order by tim.warehouse_material_id desc
+    </select>
+
+
+    <select id="selectTbInventoryMaterialListForQuartz" parameterType="TbInventoryMaterial"
+            resultMap="TbInventoryMaterialResult">
+        SELECT
+        tim.warehouse_material_id,
+        tim.quantity,
+        tim.alarm_stock,
+        tim.material_id,
+        tim.warehouse_id,
+        tim.farm_id,
+        ta.`material_name` AS material_name,
+        ta.material_type_id,
+        tat.type_name AS material_type_name,
+        tw.`name` AS warehouse_name,
+        ta.meter_unit_id AS unit,
+        tut1.type_name AS unit_name,
+        ta.price,
+        tut2.type_name AS price_unit_name
+        FROM
+        tb_inventory_material tim
+        LEFT JOIN tb_article ta ON tim.material_id = ta.material_id
+        LEFT JOIN tb_article_type tat ON ta.material_type_id = tat.material_type_id
+        LEFT JOIN tb_warehouse tw ON tim.warehouse_id = tw.warehouse_id
+        LEFT JOIN tb_unit_type tut1 ON ta.meter_unit_id = tut1.material_unit_id
+        LEFT JOIN tb_unit_type tut2 ON ta.price_unit_id = tut2.material_unit_id
+        WHERE
+        tim.alarm_stock IS NOT NULL
+        AND (tim.quantity  &lt; tim.alarm_stock)
+        ORDER BY tim.warehouse_material_id DESC
+    </select>
+
+
+    <select id="selectTbInventoryMaterialById" parameterType="Long" resultMap="TbInventoryMaterialResult">
+        <include refid="selectTbInventoryMaterialVo"/>
+        where warehouse_material_id = #{warehouseMaterialId}
+    </select>
+
+    <insert id="insertTbInventoryMaterial" parameterType="TbInventoryMaterial" useGeneratedKeys="true"
+            keyProperty="warehouseMaterialId">
+        insert into tb_inventory_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="quantity != null  ">quantity,</if>
+            <if test="alarmStock != null  ">alarm_stock,</if>
+            <if test="materialId != null  ">material_id,</if>
+            <if test="warehouseId != null  ">warehouse_id,</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="quantity != null  ">#{quantity},</if>
+            <if test="alarmStock != null  ">#{alarmStock},</if>
+            <if test="materialId != null  ">#{materialId},</if>
+            <if test="warehouseId != null  ">#{warehouseId},</if>
+            <if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTbInventoryMaterial" parameterType="TbInventoryMaterial">
+        update tb_inventory_material
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="quantity != null  ">quantity = #{quantity},</if>
+            <if test="alarmStock != null  ">alarm_stock = #{alarmStock},</if>
+            <if test="materialId != null  ">material_id = #{materialId},</if>
+            <if test="warehouseId != null  ">warehouse_id = #{warehouseId},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where warehouse_material_id = #{warehouseMaterialId}
+    </update>
+
+    <delete id="deleteTbInventoryMaterialById" parameterType="TbInventoryMaterial">
+        delete from tb_inventory_material where warehouse_material_id = #{warehouseMaterialId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbInventoryMaterialByMaterialId" parameterType="TbInventoryMaterial">
+        delete from tb_inventory_material where material_id = #{materialId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbInventoryMaterialByWarehouseId" parameterType="TbInventoryMaterial">
+        delete from tb_inventory_material where warehouse_id = #{warehouseId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbInventoryMaterialByIds" parameterType="String">
+        delete from tb_inventory_material where warehouse_material_id in
+        <foreach item="warehouseMaterialId" collection="array" open="(" separator="," close=")">
+            #{warehouseMaterialId}
+        </foreach>
+    </delete>
+
+</mapper>

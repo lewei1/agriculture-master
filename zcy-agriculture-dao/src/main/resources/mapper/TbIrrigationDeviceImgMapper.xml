@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.irrigation.TbIrrigationDeviceImgMapper">
+    
+    <resultMap type="TbIrrigationDeviceImg" id="TbIrrigationDeviceImgResult">
+        <result property="imgId"    column="img_id"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbIrrigationDeviceImgVo">
+        select img_id, img_url, device_id, create_time, create_by, farm_id from tb_irrigation_device_img
+    </sql>
+	
+    <select id="selectTbIrrigationDeviceImgList" parameterType="TbIrrigationDeviceImg" resultMap="TbIrrigationDeviceImgResult">
+        <include refid="selectTbIrrigationDeviceImgVo"/>
+        <where>  
+            <if test="imgId != null "> and img_id = #{imgId}</if>
+             <if test="imgUrl != null  and imgUrl != '' "> and img_url = #{imgUrl}</if>
+             <if test="deviceId != null "> and device_id = #{deviceId}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+
+    <select id="selectDefaultDeviceImgList" resultMap="TbIrrigationDeviceImgResult">
+        <include refid="selectTbIrrigationDeviceImgVo"/>
+        where
+            farm_id is null
+    </select>
+    
+    <select id="selectTbIrrigationDeviceImgById" parameterType="Long" resultMap="TbIrrigationDeviceImgResult">
+        <include refid="selectTbIrrigationDeviceImgVo"/>
+        where img_id = #{imgId}
+    </select>
+
+    <select id="selectIrrigationDeviceImgByDevId" parameterType="Long" resultMap="TbIrrigationDeviceImgResult">
+        <include refid="selectTbIrrigationDeviceImgVo"/>
+        where device_id = #{devId}
+    </select>
+        
+    <insert id="insertTbIrrigationDeviceImg" parameterType="TbIrrigationDeviceImg" useGeneratedKeys="true" keyProperty="imgId">
+        insert into tb_irrigation_device_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="imgUrl != null  and imgUrl != ''  ">img_url,</if>
+			<if test="deviceId != null  ">device_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="imgUrl != null  and imgUrl != ''  ">#{imgUrl},</if>
+			<if test="deviceId != null  ">#{deviceId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbIrrigationDeviceImg" parameterType="TbIrrigationDeviceImg">
+        update tb_irrigation_device_img
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="imgUrl != null  and imgUrl != ''  ">img_url = #{imgUrl},</if>
+            <if test="deviceId != null  ">device_id = #{deviceId},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where img_id = #{imgId}
+    </update>
+
+	<delete id="deleteIrrigationDeviceImgByDevId" parameterType="Long">
+        delete from tb_irrigation_device_img where device_id = #{devId}
+    </delete>
+	
+    <delete id="deleteTbIrrigationDeviceImgByIds" parameterType="String">
+        delete from tb_irrigation_device_img where img_id in 
+        <foreach item="imgId" collection="array" open="(" separator="," close=")">
+            #{imgId}
+        </foreach>
+    </delete>
+    
+</mapper>

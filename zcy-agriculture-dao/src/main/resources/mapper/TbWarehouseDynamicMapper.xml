@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbWarehouseDynamicMapper">
+    
+    <resultMap type="TbWarehouseDynamic" id="TbWarehouseDynamicResult">
+        <result property="id"    column="id"    />
+        <result property="inOutType"    column="in_out_type"    />
+        <result property="info"    column="info"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbWarehouseDynamicVo">
+        select id, in_out_type, info, create_time, farm_id from tb_warehouse_dynamic
+    </sql>
+	
+    <select id="selectTbWarehouseDynamicList" parameterType="TbWarehouseDynamic" resultMap="TbWarehouseDynamicResult">
+        <include refid="selectTbWarehouseDynamicVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="inOutType != null  and inOutType != '' "> and in_out_type = #{inOutType}</if>
+             <if test="info != null  and info != '' "> and info = #{info}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+         order by create_time desc
+    </select>
+    
+    <select id="selectTbWarehouseDynamicById" parameterType="TbWarehouseDynamic" resultMap="TbWarehouseDynamicResult">
+        <include refid="selectTbWarehouseDynamicVo"/>
+        where id = #{id} and farm_id = #{farmId}
+    </select>
+        
+    <insert id="insertTbWarehouseDynamic" parameterType="TbWarehouseDynamic" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_warehouse_dynamic
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">in_out_type,</if>
+			<if test="info != null  and info != ''  ">info,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">#{inOutType},</if>
+			<if test="info != null  and info != ''  ">#{info},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbWarehouseDynamic" parameterType="TbWarehouseDynamic">
+        update tb_warehouse_dynamic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inOutType != null  and inOutType != ''  ">in_out_type = #{inOutType},</if>
+            <if test="info != null  and info != ''  ">info = #{info},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbWarehouseDynamicById" parameterType="TbWarehouseDynamic">
+        delete from tb_warehouse_dynamic where id = #{id} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbWarehouseDynamicByIds" parameterType="String">
+        delete from tb_warehouse_dynamic where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+<!--     新增计划时  插入物品动态 -->
+    <insert id="insertByMap" parameterType="Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_warehouse_dynamic (
+			in_out_type,
+			farm_id,
+			info
+		)
+		VALUES
+		('O',#{farmId},
+			CONCAT(
+			(SELECT IFNULL(u.nick_name,'') FROM vb_user u WHERE u.user_code = #{userCode} AND u.farm_id=#{farmId}),
+			'出库',
+			#{info},
+			(SELECT IFNULL(a.material_name,'') FROM tb_article a WHERE a.material_id = #{materialId})
+			)
+		)
+    </insert>
+</mapper>

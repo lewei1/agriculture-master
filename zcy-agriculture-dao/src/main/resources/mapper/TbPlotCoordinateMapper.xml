@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.plot.TbPlotCoordinateMapper">
+    
+    <resultMap type="TbPlotCoordinate" id="TbPlotCoordinateResult">
+        <result property="coordinateId"    column="coordinate_id"    />
+        <result property="latitude"    column="latitude"    />
+        <result property="longitude"    column="longitude"    />
+        <result property="coordinateStatus"    column="coordinate_status"    />
+        <result property="plotId"    column="plot_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlotCoordinateVo">
+        select coordinate_id, latitude, longitude, coordinate_status, plot_id from tb_plot_coordinate
+    </sql>
+	
+    <select id="selectTbPlotCoordinateList" parameterType="TbPlotCoordinate" resultMap="TbPlotCoordinateResult">
+        <include refid="selectTbPlotCoordinateVo"/>
+        <where>  
+            <if test="coordinateId != null "> and coordinate_id = #{coordinateId}</if>
+             <if test="latitude != null  and latitude != '' "> and latitude = #{latitude}</if>
+             <if test="longitude != null  and longitude != '' "> and longitude = #{longitude}</if>
+             <if test="coordinateStatus != null "> and coordinate_status = #{coordinateStatus}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlotCoordinateById" parameterType="Long" resultMap="TbPlotCoordinateResult">
+        <include refid="selectTbPlotCoordinateVo"/>
+        where coordinate_id = #{coordinateId}
+    </select>
+        
+    <insert id="insertTbPlotCoordinate" parameterType="TbPlotCoordinate" useGeneratedKeys="true" keyProperty="coordinateId">
+        insert into tb_plot_coordinate
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="latitude != null  and latitude != ''  ">latitude,</if>
+			<if test="longitude != null  and longitude != ''  ">longitude,</if>
+			<if test="coordinateStatus != null  ">coordinate_status,</if>
+			<if test="plotId != null  ">plot_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="latitude != null  and latitude != ''  ">#{latitude},</if>
+			<if test="longitude != null  and longitude != ''  ">#{longitude},</if>
+			<if test="coordinateStatus != null  ">#{coordinateStatus},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertTbPlotCoordinateList" parameterType="java.util.List">
+        insert into tb_plot_coordinate(
+            latitude,
+            longitude,
+            plot_id
+        )VALUES
+        <foreach collection="list" item="coordinate" separator=",">
+            (
+                #{coordinate.latitude},
+                #{coordinate.longitude},
+                #{coordinate.plotId}
+            )
+        </foreach>
+    </insert>
+	 
+    <update id="updateTbPlotCoordinate" parameterType="TbPlotCoordinate">
+        update tb_plot_coordinate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="latitude != null  and latitude != ''  ">latitude = #{latitude},</if>
+            <if test="longitude != null  and longitude != ''  ">longitude = #{longitude},</if>
+            <if test="coordinateStatus != null  ">coordinate_status = #{coordinateStatus},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+        </trim>
+        where coordinate_id = #{coordinateId}
+    </update>
+
+	<delete id="deleteTbPlotCoordinateById" parameterType="Long">
+        delete from tb_plot_coordinate where coordinate_id = #{coordinateId}
+    </delete>
+	
+    <delete id="deleteTbPlotCoordinateByIds" parameterType="String">
+        delete from tb_plot_coordinate where coordinate_id in 
+        <foreach item="coordinateId" collection="array" open="(" separator="," close=")">
+            #{coordinateId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTbPlotCoordinateByPlotId" parameterType="Long">
+        delete from tb_plot_coordinate where plot_id = #{plotId}
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbResDeviceMapper">
+    
+    <resultMap type="TbResDevice" id="TbResDeviceResult">
+        <result property="devId"    column="dev_id"    />
+        <result property="devName"    column="dev_name"    />
+        <result property="devNum"    column="dev_num"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="lng"    column="lng"    />
+        <result property="lat"    column="lat"    />
+        <result property="electricity"    column="electricity"    />
+        <result property="devType"    column="dev_type"    />
+        <result property="lastPhotoTime"    column="last_photo_time"    />
+        <result property="shootingInterval"    column="shooting_interval"    />
+        <result property="status"    column="status"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="createTime"    column="create_time"    />
+
+    </resultMap>
+	
+	<sql id="selectTbResDeviceVo">
+        select dev_id, dev_name, dev_num, plot_id, lng, lat, electricity, dev_type, last_photo_time, shooting_interval, status, farm_id,create_time from tb_res_device
+    </sql>
+	
+    <select id="selectTbResDeviceList" parameterType="TbResDevice" resultMap="TbResDeviceResult">
+        <include refid="selectTbResDeviceVo"/>
+        <where>  
+            <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devName != null  and devName != '' "> and dev_name = #{devName}</if>
+             <if test="devNum != null  and devNum != '' "> and dev_num = #{devNum}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="lng != null "> and lng = #{lng}</if>
+             <if test="lat != null "> and lat = #{lat}</if>
+             <if test="electricity != null "> and electricity = #{electricity}</if>
+             <if test="devType != null "> and dev_type = #{devType}</if>
+             <if test="lastPhotoTime != null "> and last_photo_time = #{lastPhotoTime}</if>
+             <if test="shootingInterval != null "> and shooting_interval = #{shootingInterval}</if>
+             <if test="status != null "> and status = #{status}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectTbResDeviceById" parameterType="Long" resultMap="TbResDeviceResult">
+        <include refid="selectTbResDeviceVo"/>
+        where dev_id = #{devId}
+    </select>
+        
+    <insert id="insertTbResDevice" parameterType="TbResDevice" useGeneratedKeys="true" keyProperty="devId">
+        insert into tb_res_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="devName != null  and devName != ''  ">dev_name,</if>
+			<if test="devNum != null  and devNum != ''  ">dev_num,</if>
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="lng != null  ">lng,</if>
+			<if test="lat != null  ">lat,</if>
+			<if test="electricity != null  ">electricity,</if>
+			<if test="devType != null  ">dev_type,</if>
+			<if test="lastPhotoTime != null  ">last_photo_time,</if>
+			<if test="shootingInterval != null  ">shooting_interval,</if>
+			<if test="status != null  ">status,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+            create_time
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="devName != null  and devName != ''  ">#{devName},</if>
+			<if test="devNum != null  and devNum != ''  ">#{devNum},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="lng != null  ">#{lng},</if>
+			<if test="lat != null  ">#{lat},</if>
+			<if test="electricity != null  ">#{electricity},</if>
+			<if test="devType != null  ">#{devType},</if>
+			<if test="lastPhotoTime != null  ">#{lastPhotoTime},</if>
+			<if test="shootingInterval != null  ">#{shootingInterval},</if>
+			<if test="status != null  ">#{status},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+            sysdate()
+         </trim>
+    </insert>
+
+    <update id="updateTbResDevice" parameterType="TbResDevice">
+        update tb_res_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="devName != null  and devName != ''  ">dev_name = #{devName},</if>
+            <if test="devNum != null  and devNum != ''  ">dev_num = #{devNum},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="lng != null  ">lng = #{lng},</if>
+            <if test="lat != null  ">lat = #{lat},</if>
+            <if test="electricity != null  ">electricity = #{electricity},</if>
+            <if test="devType != null  ">dev_type = #{devType},</if>
+            <if test="lastPhotoTime != null  ">last_photo_time = #{lastPhotoTime},</if>
+            <if test="shootingInterval != null  ">shooting_interval = #{shootingInterval},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where dev_id = #{devId}
+    </update>
+
+    <update id="updateResDeviceListStatus" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE tb_res_device
+            SET
+                status = #{item.status}
+            WHERE
+                dev_num = #{item.devNum}
+        </foreach>
+    </update>
+
+	<delete id="deleteTbResDeviceById" parameterType="Long">
+        delete from tb_res_device where dev_id = #{devId}
+    </delete>
+
+    <delete id="deleteTbResDeviceByIds" parameterType="String">
+        delete from tb_res_device where dev_id in 
+        <foreach item="devId" collection="array" open="(" separator="," close=")">
+            #{devId}
+        </foreach>
+    </delete>
+
+    <select id="getCountFromTbResDevice" parameterType="TbResDevice" resultType="Long">
+        select count(*) num from tb_res_device
+        <where>
+            <if test="devId != null "> and dev_id = #{devId}</if>
+            <if test="devName != null  and devName != '' "> and dev_name = #{devName}</if>
+            <if test="devNum != null  and devNum != '' "> and dev_num = #{devNum}</if>
+            <if test="plotId != null "> and plot_id = #{plotId}</if>
+            <if test="lng != null "> and lng = #{lng}</if>
+            <if test="lat != null "> and lat = #{lat}</if>
+            <if test="lastPhotoTime != null "> and last_photo_time = #{lastPhotoTime}</if>
+            <if test="electricity != null "> and electricity = #{electricity}</if>
+            <if test="devType != null "> and dev_type = #{devType}</if>
+            <if test="shootingInterval != null "> and shooting_interval = #{shootingInterval}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+        </where>
+    </select>
+
+    <select id="getCountFromTbResDeviceByDevNum" parameterType="String"  resultType="Long">
+        select count(*) num from tb_res_device where dev_num = #{devNum}
+    </select>
+<!--     首页设备统计 -->
+    <select id="selectByDeviceType" parameterType="String"  resultType="HashMap">
+        SELECT
+			t.dev_type AS devType,
+			count(1) AS cou,
+			SUM(IF(t.`status` = 0, 1, 0)) AS bj,
+			SUM(IF(t.`status` = 1, 1, 0)) AS yx
+		FROM
+			tb_res_device t
+		WHERE t.farm_id=#{farmId} AND t.dev_type IN (0,2)
+		GROUP BY
+			t.dev_type
+    </select>
+<!--     根据地块 和类型查询 设备 -->
+    <select id="selectByDeviceList" parameterType="HashMap" resultMap="TbResDeviceResult">
+        SELECT
+			t.*
+		FROM
+			tb_res_device t
+		WHERE
+			t.farm_id = #{farmId}
+		<if test="plotIds != null  and plotIds != '' "> and t.plot_id IN (${plotIds})</if>
+		AND t.dev_type IN (${devTypes})
+    </select>
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbWarehouseRecordTypeMapper">
+    
+    <resultMap type="TbWarehouseRecordType" id="TbWarehouseRecordTypeResult">
+        <result property="inOutTypeId"    column="in_out_type_id"    />
+        <result property="inOutType"    column="in_out_type"    />
+        <result property="name"    column="name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbWarehouseRecordTypeVo">
+        select in_out_type_id, in_out_type, name, create_time, create_by, update_time, update_by, farm_id from tb_warehouse_record_type
+    </sql>
+	
+    <select id="selectTbWarehouseRecordTypeList" parameterType="TbWarehouseRecordType" resultMap="TbWarehouseRecordTypeResult">
+        <include refid="selectTbWarehouseRecordTypeVo"/>
+        <where>  
+            <if test="inOutTypeId != null "> and in_out_type_id = #{inOutTypeId}</if>
+             <if test="inOutType != null  and inOutType != '' "> and in_out_type = #{inOutType}</if>
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbWarehouseRecordTypeById" parameterType="TbWarehouseRecordType" resultMap="TbWarehouseRecordTypeResult">
+        <include refid="selectTbWarehouseRecordTypeVo"/>
+        where in_out_type_id = #{inOutTypeId} and farm_id = #{farmId}
+    </select>
+        
+    <insert id="insertTbWarehouseRecordType" parameterType="TbWarehouseRecordType" useGeneratedKeys="true" keyProperty="inOutTypeId">
+        insert into tb_warehouse_record_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">in_out_type,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">#{inOutType},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbWarehouseRecordType" parameterType="TbWarehouseRecordType">
+        update tb_warehouse_record_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inOutType != null  and inOutType != ''  ">in_out_type = #{inOutType},</if>
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where in_out_type_id = #{inOutTypeId}
+    </update>
+
+	<delete id="deleteTbWarehouseRecordTypeById" parameterType="TbWarehouseRecordType">
+        delete from tb_warehouse_record_type where in_out_type_id = #{inOutTypeId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbWarehouseRecordTypeByIds" parameterType="String">
+        delete from tb_warehouse_record_type where in_out_type_id in 
+        <foreach item="inOutTypeId" collection="array" open="(" separator="," close=")">
+            #{inOutTypeId}
+        </foreach>
+    </delete>
+    
+</mapper>

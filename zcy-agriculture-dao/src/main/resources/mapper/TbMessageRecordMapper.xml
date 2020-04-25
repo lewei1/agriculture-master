@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbMessageRecordMapper">
+
+    <resultMap type="TbMessageRecord" id="TbMessageRecordResult">
+        <result property="messageId" column="message_id"/>
+        <result property="messageType" column="message_type"/>
+        <result property="messageSubject" column="message_subject"/>
+        <result property="messageContent" column="message_content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="messageStatus" column="message_status"/>
+        <result property="sendUserId" column="send_user_id"/>
+        <result property="receiveUserId" column="receive_user_id"/>
+        <result property="farmId" column="farm_id"/>
+    </resultMap>
+
+    <sql id="selectTbMessageRecordVo">
+               select message_id, message_type, message_subject, message_content, create_time, message_status, send_user_id, receive_user_id, farm_id from tb_message_record
+    </sql>
+
+    <select id="selectTbMessageRecordList" parameterType="TbMessageRecord" resultMap="TbMessageRecordResult">
+        <include refid="selectTbMessageRecordVo"/>
+        <where>
+            (receive_user_id = #{receiveUserId} or farm_id = #{farmId})
+            <if test="messageId != null ">and message_id = #{messageId}</if>
+            <if test="messageType != null ">and message_type = #{messageType}</if>
+            <if test="messageSubject != null  and messageSubject != '' ">and message_subject = #{messageSubject}</if>
+            <if test="messageContent != null  and messageContent != '' ">and message_content = #{messageContent}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="messageStatus != null ">and message_status = #{messageStatus}</if>
+            <if test="sendUserId != null ">and send_user_id = #{sendUserId}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectTbMessageRecordById" parameterType="Long" resultMap="TbMessageRecordResult">
+        <include refid="selectTbMessageRecordVo"/>
+        where message_id = #{messageId}
+    </select>
+
+    <insert id="insertTbMessageRecord" parameterType="TbMessageRecord" useGeneratedKeys="true" keyProperty="messageId">
+        insert into tb_message_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="messageType != null  ">message_type,</if>
+            <if test="messageSubject != null  and messageSubject != ''  ">message_subject,</if>
+            <if test="messageContent != null  and messageContent != ''  ">message_content,</if>
+            <if test="createTime != null  ">create_time,</if>
+            <if test="messageStatus != null  ">message_status,</if>
+            <if test="sendUserId != null  ">send_user_id,</if>
+            <if test="receiveUserId != null  ">receive_user_id,</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="messageType != null  ">#{messageType},</if>
+            <if test="messageSubject != null  and messageSubject != ''  ">#{messageSubject},</if>
+            <if test="messageContent != null  and messageContent != ''  ">#{messageContent},</if>
+            <if test="createTime != null  ">#{createTime},</if>
+            <if test="messageStatus != null  ">#{messageStatus},</if>
+            <if test="sendUserId != null  ">#{sendUserId},</if>
+            <if test="receiveUserId != null  ">#{receiveUserId},</if>
+            <if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTbMessageRecord" parameterType="TbMessageRecord">
+        update tb_message_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="messageType != null  ">message_type = #{messageType},</if>
+            <if test="messageSubject != null  and messageSubject != ''  ">message_subject = #{messageSubject},</if>
+            <if test="messageContent != null  and messageContent != ''  ">message_content = #{messageContent},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="messageStatus != null  ">message_status = #{messageStatus},</if>
+            <if test="receiveUserId != null  ">receive_user_id = #{receiveUserId},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where message_id = #{messageId}
+        <if test="sendUserId != null ">and send_user_id = #{sendUserId}</if>
+    </update>
+
+    <delete id="deleteTbMessageRecordById" parameterType="Long">
+        delete from tb_message_record where message_id = #{messageId}
+    </delete>
+
+    <delete id="deleteTbMessageRecordByIds" parameterType="Map">
+        delete from tb_message_record where message_id in
+        <foreach item="messageIds" collection="messageIds" open="(" separator="," close=")">
+            #{messageIds}
+        </foreach>
+        <if test="sendUserId != null ">and send_user_id = #{sendUserId}</if>
+        <if test="receiveUserId != null ">and receive_user_id = #{receiveUserId}</if>
+        <if test="farmId != null  and farmId != ''  ">and farm_id = #{farmId}</if>
+    </delete>
+
+    <update id="updateMessageStatus" parameterType="TbMessageRecord">
+        update tb_message_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="messageStatus != null  ">message_status = #{messageStatus},</if>
+        </trim>
+        <where>
+            (receive_user_id = #{receiveUserId} or farm_id = #{farmId})
+            <if test="messageId != null ">and message_id = #{messageId}</if>
+            <if test="messageType != null ">and message_type = #{messageType}</if>
+        </where>
+    </update>
+    <!--     新增计划时  插入任务安排状况 -->
+    <insert id="insertByMap" parameterType="Map" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO tb_message_record (
+        message_type,
+        message_status,
+        send_user_id,
+        receive_user_id,
+        message_subject,
+        farm_id,
+        message_content
+        )
+        VALUES
+        <if test="planId == null">
+            (1,0,#{sendUserId},#{receiveUserId},#{messageSubject},#{farmId},
+            CONCAT(
+            (SELECT IFNULL(u.nick_name,'') FROM vb_user u WHERE u.user_code = #{sendUserId} AND u.farm_id=#{farmId}),
+            '安排了任务【',
+            (SELECT IFNULL(t.farming_type_name,'') FROM tb_farming_type t WHERE t.farming_type_id = #{farmingTypeId}),
+            '】给',
+            (SELECT IFNULL(u.nick_name,'') FROM vb_user u WHERE u.user_code = #{receiveUserId} AND u.farm_id=#{farmId})
+            )
+            )
+        </if>
+        <if test="planId != null ">
+            (1,0,#{sendUserId},(SELECT p.create_by FROM tb_farming_plan p WHERE p.plan_id=#{planId}),#{messageSubject},#{farmId},
+            CONCAT(
+            (SELECT IFNULL(u.nick_name,'') FROM vb_user u WHERE u.user_code = #{sendUserId} AND u.farm_id=#{farmId}),
+            '确认完成了任务【',
+            (SELECT t.farming_type_name FROM tb_farming_type t WHERE t.farming_type_id = (SELECT p.farming_type_id FROM
+            tb_farming_plan p WHERE p.plan_id=#{planId})),
+            '】'
+            )
+            )
+        </if>
+    </insert>
+
+    <update id="updateMessageStatusByIds" parameterType="Map">
+        update tb_message_record set message_status = #{messageStatus}
+        <where>
+            (receive_user_id = #{receiveUserId} or farm_id = #{farmId})
+            and message_id in
+            <foreach item="messageIds" collection="messageIds" open="(" separator="," close=")">
+                #{messageIds}
+            </foreach>
+        </where>
+    </update>
+
+    <!--     首页统计消息 -->
+    <select id="selectBystatisticsType" resultType="HashMap">
+        SELECT
+			t.message_type AS messageType,
+			count(0) AS count,
+			IFNULL(SUM(t.message_status),0) AS msgTotal
+		FROM
+			tb_message_record t
+		WHERE t.farm_id=#{farmId} 
+		<if test="userId != null "> AND (t.message_type =0 OR (t.message_type =1 AND t.receive_user_id=#{userId})) </if>
+		GROUP BY
+			t.message_type
+    </select>
+    <!-- 首页统计  报警统计 -->
+    <select id="selectByStatisticsDateList" parameterType="String" resultType="HashMap">
+         <if test="type !=2 ">
+         SELECT
+			k.date,
+			count(0) AS cou
+		FROM
+			(
+		</if>
+				SELECT
+					<if test="type ==1 ">DATE_FORMAT(t.create_time, '%Y%m%d') AS date</if>
+					<if test="type ==2 ">count(0) AS cou</if>
+				FROM
+					tb_message_record t
+				WHERE 
+					t.farm_id = #{farmId}
+				AND t.message_type=0
+				AND t.create_time >= STR_TO_DATE(#{createTimeStr},'%Y-%m-%d %H:%i:%s')
+					<if test="createTimeEnd !=null and createTimeEnd !='' "> AND STR_TO_DATE(#{createTimeEnd},'%Y-%m-%d %H:%i:%s') >= t.create_time </if>
+		<if test="type !=2 ">
+			) k
+		 GROUP BY k.date 
+		</if>
+    </select>
+      <!-- 首页统计  报警时间分布 -->
+    <select id="selectByStatisticsTimeList" parameterType="String" resultType="HashMap">
+         SELECT
+			k.h,
+			k.cou,
+			k.time
+		FROM
+			(
+				SELECT
+					DATE_FORMAT(t.create_time, '%Y%m%d%H') AS h,
+					DATE_FORMAT(t.create_time, '%H') AS time,
+					count(1) AS cou
+				FROM
+					tb_message_record t
+				WHERE t.farm_id = #{farmId} AND t.message_type=0
+				<if test="createTimeStr !=null and createTimeStr !='' "> AND t.create_time>=STR_TO_DATE(#{createTimeStr}, '%Y-%m-%d %H:%i:%s') </if>
+				GROUP BY
+					DATE_FORMAT(t.create_time, '%Y%m%d%H')
+			) k
+		ORDER BY
+			k.h
+    </select>
+</mapper>

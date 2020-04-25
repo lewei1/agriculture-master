@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbResRoleMapper">
+    
+    <resultMap type="TbResRole" id="TbResRoleResult">
+        <result property="roleId"    column="role_id"    />
+        <result property="name"    column="name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+	
+	<sql id="selectTbResRoleVo">
+        select role_id, name, create_time, update_time, farm_id, status from tb_res_role
+    </sql>
+	
+    <select id="selectTbResRoleList" parameterType="TbResRole" resultMap="TbResRoleResult">
+        <include refid="selectTbResRoleVo"/>
+        <where>  
+             and role_id > 1
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="status != null "> and status = #{status}</if>
+         </where>
+        order by update_time desc
+    </select>
+    
+    <select id="selectTbResRoleById" parameterType="Long" resultMap="TbResRoleResult">
+        <include refid="selectTbResRoleVo"/>
+        where role_id = #{roleId}
+    </select>
+
+    <select id="getRoleCountWithName"  resultType="Long">
+        select count(*) num from tb_res_role WHERE tb_res_role.name = #{name} AND (ISNULL(status)||status = 0) AND tb_res_role.farm_id = #{farmId}
+    </select>
+
+    <insert id="insertTbResRole" parameterType="TbResRole" useGeneratedKeys="true" keyProperty="roleId">
+        insert into tb_res_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="status != null  ">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="status != null  ">#{status},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbResRole" parameterType="TbResRole">
+        update tb_res_role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="status != null  ">status = #{status},</if>
+        </trim>
+        where role_id = #{roleId}
+    </update>
+
+	<delete id="deleteTbRoleById" parameterType="Long">
+        update tb_res_role set tb_res_role.status = 1,tb_res_role.update_time= CURRENT_TIMESTAMP WHERE role_id = #{roleId}
+    </delete>
+
+
+    <select id="getRoleCountWithID" parameterType="Long" resultType="Long">
+         select count(*) num from tb_res_role WHERE role_id = #{roleId} AND (ISNULL(status)||status = 0)
+    </select>
+
+    <delete id="deleteTbResRoleByIds" parameterType="String">
+        update tb_res_role set tb_res_role.status = 1,tb_res_role.update_time= CURRENT_TIMESTAMP WHERE role_id in
+        <foreach item="roleId" collection="array" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+    
+</mapper>

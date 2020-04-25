@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbPayLogMapper">
+    
+    <resultMap type="TbPayLog" id="TbPayLogResult">
+        <result property="logId"    column="log_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="spendTime"    column="spend_time"    />
+        <result property="method"    column="method"    />
+        <result property="userAgent"    column="user_agent"    />
+        <result property="userIp"    column="user_ip"    />
+        <result property="optContent"    column="opt_content"    />
+        <result property="url"    column="url"    />
+        <result property="optResult"    column="opt_result"    />
+    </resultMap>
+	
+	<sql id="selectTbPayLogVo">
+        select log_id, user_id, farm_id, create_time, spend_time, method, user_agent, user_ip, opt_content, url, opt_result from tb_pay_log
+    </sql>
+	
+    <select id="selectTbPayLogList" parameterType="TbPayLog" resultMap="TbPayLogResult">
+        <include refid="selectTbPayLogVo"/>
+        <where>  
+            <if test="logId != null "> and log_id = #{logId}</if>
+             <if test="userId != null  and userId != '' "> and user_id = #{userId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="spendTime != null "> and spend_time = #{spendTime}</if>
+             <if test="method != null  and method != '' "> and method = #{method}</if>
+             <if test="userAgent != null  and userAgent != '' "> and user_agent = #{userAgent}</if>
+             <if test="userIp != null  and userIp != '' "> and user_ip = #{userIp}</if>
+             <if test="optContent != null  and optContent != '' "> and opt_content = #{optContent}</if>
+             <if test="url != null  and url != '' "> and url = #{url}</if>
+             <if test="optResult != null  and optResult != '' "> and opt_result = #{optResult}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPayLogById" parameterType="Integer" resultMap="TbPayLogResult">
+        <include refid="selectTbPayLogVo"/>
+        where log_id = #{logId}
+    </select>
+        
+    <insert id="insertTbPayLog" parameterType="TbPayLog" useGeneratedKeys="true" keyProperty="logId">
+        insert into tb_pay_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId != null  and userId != ''  ">user_id,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="spendTime != null  ">spend_time,</if>
+			<if test="method != null  and method != ''  ">method,</if>
+			<if test="userAgent != null  and userAgent != ''  ">user_agent,</if>
+			<if test="userIp != null  and userIp != ''  ">user_ip,</if>
+			<if test="optContent != null  and optContent != ''  ">opt_content,</if>
+			<if test="url != null  and url != ''  ">url,</if>
+			<if test="optResult != null  and optResult != ''  ">opt_result,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId != null  and userId != ''  ">#{userId},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="spendTime != null  ">#{spendTime},</if>
+			<if test="method != null  and method != ''  ">#{method},</if>
+			<if test="userAgent != null  and userAgent != ''  ">#{userAgent},</if>
+			<if test="userIp != null  and userIp != ''  ">#{userIp},</if>
+			<if test="optContent != null  and optContent != ''  ">#{optContent},</if>
+			<if test="url != null  and url != ''  ">#{url},</if>
+			<if test="optResult != null  and optResult != ''  ">#{optResult},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbPayLog" parameterType="TbPayLog">
+        update tb_pay_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null  and userId != ''  ">user_id = #{userId},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="spendTime != null  ">spend_time = #{spendTime},</if>
+            <if test="method != null  and method != ''  ">method = #{method},</if>
+            <if test="userAgent != null  and userAgent != ''  ">user_agent = #{userAgent},</if>
+            <if test="userIp != null  and userIp != ''  ">user_ip = #{userIp},</if>
+            <if test="optContent != null  and optContent != ''  ">opt_content = #{optContent},</if>
+            <if test="url != null  and url != ''  ">url = #{url},</if>
+            <if test="optResult != null  and optResult != ''  ">opt_result = #{optResult},</if>
+        </trim>
+        where log_id = #{logId}
+    </update>
+
+	<delete id="deleteTbPayLogById" parameterType="Integer">
+        delete from tb_pay_log where log_id = #{logId}
+    </delete>
+	
+    <delete id="deleteTbPayLogByIds" parameterType="String">
+        delete from tb_pay_log where log_id in 
+        <foreach item="logId" collection="array" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+    </delete>
+<!--     删除30天以前的数据 -->
+    <delete id="deleteByDate" parameterType="String">
+        delete from tb_pay_log where STR_TO_DATE(#{today}, '%Y-%m-%d')>create_time
+    </delete>
+</mapper>

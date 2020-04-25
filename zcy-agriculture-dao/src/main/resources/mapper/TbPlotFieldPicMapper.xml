@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.plot.TbPlotFieldPicMapper">
+    
+    <resultMap type="TbPlotFieldPic" id="TbPlotFieldPicResult">
+        <result property="fieldPicId"    column="field_pic_id"    />
+        <result property="picUrl"    column="pic_url"    />
+        <result property="picSequence"    column="pic_sequence"    />
+        <result property="plotId"    column="plot_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlotFieldPicVo">
+        select field_pic_id, pic_url, pic_sequence, plot_id from tb_plot_field_pic
+    </sql>
+	
+    <select id="selectTbPlotFieldPicList" parameterType="TbPlotFieldPic" resultMap="TbPlotFieldPicResult">
+        <include refid="selectTbPlotFieldPicVo"/>
+        <where>  
+            <if test="fieldPicId != null "> and field_pic_id = #{fieldPicId}</if>
+             <if test="picUrl != null  and picUrl != '' "> and pic_url = #{picUrl}</if>
+             <if test="picSequence != null "> and pic_sequence = #{picSequence}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlotFieldPicById" parameterType="Long" resultMap="TbPlotFieldPicResult">
+        <include refid="selectTbPlotFieldPicVo"/>
+        where field_pic_id = #{fieldPicId}
+    </select>
+        
+    <insert id="insertTbPlotFieldPic" parameterType="TbPlotFieldPic" useGeneratedKeys="true" keyProperty="fieldPicId">
+        insert into tb_plot_field_pic
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="picUrl != null  and picUrl != ''  ">pic_url,</if>
+			<if test="picSequence != null  ">pic_sequence,</if>
+			<if test="plotId != null  ">plot_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="picUrl != null  and picUrl != ''  ">#{picUrl},</if>
+			<if test="picSequence != null  ">#{picSequence},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertTbPlotFieldPicList" parameterType="java.util.List">
+        insert into tb_plot_field_pic(
+            pic_url,
+            pic_sequence,
+            plot_id
+        )VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.picUrl},
+                #{item.picSequence},
+                #{item.plotId}
+            )
+        </foreach>
+    </insert>
+	 
+    <update id="updateTbPlotFieldPic" parameterType="TbPlotFieldPic">
+        update tb_plot_field_pic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="picUrl != null  and picUrl != ''  ">pic_url = #{picUrl},</if>
+            <if test="picSequence != null  ">pic_sequence = #{picSequence},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+        </trim>
+        where field_pic_id = #{fieldPicId}
+    </update>
+
+	<delete id="deleteTbPlotFieldPicById" parameterType="Long">
+        delete from tb_plot_field_pic where field_pic_id = #{fieldPicId}
+    </delete>
+
+	<delete id="deleteTbPlotFieldPicByPlotId" parameterType="Long">
+        delete from tb_plot_field_pic where plot_id = #{plotId}
+    </delete>
+
+    <delete id="deleteTbPlotFieldPicByIds" parameterType="String">
+        delete from tb_plot_field_pic where field_pic_id in 
+        <foreach item="fieldPicId" collection="array" open="(" separator="," close=")">
+            #{fieldPicId}
+        </foreach>
+    </delete>
+    
+</mapper>

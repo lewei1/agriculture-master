@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbHarvestImgMapper">
+    
+    <resultMap type="TbHarvestImg" id="TbHarvestImgResult">
+        <result property="harvestImgId"    column="harvest_img_id"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="imgSequence"    column="img_sequence"    />
+        <result property="harvestId"    column="harvest_id"    />
+    </resultMap>
+	
+	<sql id="selectTbHarvestImgVo">
+        select harvest_img_id, img_url, img_sequence, harvest_id from tb_harvest_img
+    </sql>
+	
+    <select id="selectTbHarvestImgList" parameterType="TbHarvestImg" resultMap="TbHarvestImgResult">
+        <include refid="selectTbHarvestImgVo"/>
+        <where>  
+            <if test="harvestImgId != null "> and harvest_img_id = #{harvestImgId}</if>
+             <if test="imgUrl != null  and imgUrl != '' "> and img_url = #{imgUrl}</if>
+             <if test="imgSequence != null "> and img_sequence = #{imgSequence}</if>
+             <if test="harvestId != null "> and harvest_id = #{harvestId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbHarvestImgById" parameterType="Long" resultMap="TbHarvestImgResult">
+        <include refid="selectTbHarvestImgVo"/>
+        where harvest_img_id = #{harvestImgId}
+    </select>
+        
+    <insert id="insertTbHarvestImg" parameterType="TbHarvestImg" useGeneratedKeys="true" keyProperty="harvestImgId">
+        insert into tb_harvest_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="imgUrl != null  and imgUrl != ''  ">img_url,</if>
+			<if test="imgSequence != null  ">img_sequence,</if>
+			<if test="harvestId != null  ">harvest_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="imgUrl != null  and imgUrl != ''  ">#{imgUrl},</if>
+			<if test="imgSequence != null  ">#{imgSequence},</if>
+			<if test="harvestId != null  ">#{harvestId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbHarvestImg" parameterType="TbHarvestImg">
+        update tb_harvest_img
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="imgUrl != null  and imgUrl != ''  ">img_url = #{imgUrl},</if>
+            <if test="imgSequence != null  ">img_sequence = #{imgSequence},</if>
+            <if test="harvestId != null  ">harvest_id = #{harvestId},</if>
+        </trim>
+        where harvest_img_id = #{harvestImgId}
+    </update>
+
+	<delete id="deleteTbHarvestImgById" parameterType="Long">
+        delete from tb_harvest_img where harvest_img_id = #{harvestImgId}
+    </delete>
+	
+    <delete id="deleteTbHarvestImgByIds" parameterType="String">
+        delete from tb_harvest_img where harvest_img_id in
+        <foreach item="harvestImgId" collection="array" open="(" separator="," close=")">
+            #{harvestImgId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTbHarvestImgByHarvestId" parameterType="Long">
+        delete from tb_harvest_img where harvest_id = #{harvestId}
+    </delete>
+    <!-- 批量插入采收管理图片-->
+   <insert id ="insertHarvestImgBatch" parameterType="java.util.List" >
+         insert into tb_harvest_img
+         	(img_url, harvest_id)
+         values
+          <foreach collection ="list" item="ti" index= "index" separator =",">
+              (#{ti.imgUrl}, #{ti.harvestId})
+          </foreach >
+   </insert >
+</mapper>

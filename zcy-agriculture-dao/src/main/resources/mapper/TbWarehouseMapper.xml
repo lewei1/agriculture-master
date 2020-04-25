@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbWarehouseMapper">
+    
+    <resultMap type="TbWarehouse" id="TbWarehouseResult">
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="name"    column="name"    />
+        <result property="warehouseStatus"    column="warehouse_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbWarehouseVo">
+        select warehouse_id, name, warehouse_status, create_time, create_by, update_time, update_by, farm_id from tb_warehouse
+    </sql>
+	
+    <select id="selectTbWarehouseList" parameterType="TbWarehouse" resultMap="TbWarehouseResult">
+        <include refid="selectTbWarehouseVo"/>
+        <where>  
+            <if test="warehouseId != null "> and warehouse_id = #{warehouseId}</if>
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="warehouseStatus != null "> and warehouse_status = #{warehouseStatus}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbWarehouseById" parameterType="TbWarehouse" resultMap="TbWarehouseResult">
+        <include refid="selectTbWarehouseVo"/>
+        where warehouse_id = #{warehouseId} and farm_id = #{farmId}
+    </select>
+        
+    <insert id="insertTbWarehouse" parameterType="TbWarehouse" useGeneratedKeys="true" keyProperty="warehouseId">
+        insert into tb_warehouse
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="warehouseStatus != null  ">warehouse_status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="warehouseStatus != null  ">#{warehouseStatus},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbWarehouse" parameterType="TbWarehouse">
+        update tb_warehouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="warehouseStatus != null  ">warehouse_status = #{warehouseStatus},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where warehouse_id = #{warehouseId}
+    </update>
+
+	<delete id="deleteTbWarehouseById" parameterType="TbWarehouse">
+        delete from tb_warehouse where warehouse_id = #{warehouseId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbWarehouseByIds" parameterType="String">
+        delete from tb_warehouse where warehouse_id in 
+        <foreach item="warehouseId" collection="array" open="(" separator="," close=")">
+            #{warehouseId}
+        </foreach>
+    </delete>
+    
+</mapper>

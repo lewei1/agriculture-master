@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbLiveStreamingMapper">
+
+
+    <resultMap type="LiveStreamingDetailVo" id="LiveStreamingParamResult">
+        <result property="devId" column="dev_id"/>
+        <result property="devName" column="dev_name"/>
+        <result property="devNum" column="dev_num"/>
+        <result property="plotId" column="plot_id"/>
+        <result property="status" column="status"/>
+        <result property="farmId" column="farm_id"/>
+        <result property="cameraPic" column="loc"/>
+        <result property="plotName" column="plot_name"/>
+    </resultMap>
+
+
+    <select id="selectCameraByDevNum" parameterType="LiveStreamingParam" resultMap="LiveStreamingParamResult">
+        SELECT r.dev_id, r.dev_name, r.dev_num, r.plot_id, r. STATUS, r.farm_id, p.plot_name FROM tb_res_device r
+        LEFT JOIN tb_plot p ON r.plot_id = p.plot_id
+        where r.dev_num = #{devNum} and r.farm_id = #{farmId}
+    </select>
+
+
+    <select id="selectCameraById" parameterType="LiveStreamingParam" resultMap="LiveStreamingParamResult">
+        SELECT r.dev_id, r.dev_name, r.dev_num, r.plot_id, r. STATUS, r.farm_id, p.plot_name FROM tb_res_device r
+        LEFT JOIN tb_plot p ON r.plot_id = p.plot_id
+        where r.dev_id = #{devId} and r.farm_id = #{farmId}
+    </select>
+
+    <insert id="insertCameraDevice" parameterType="LiveStreamingParam" useGeneratedKeys="true" keyProperty="devId">
+        insert into tb_res_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="devName != null  and devName != ''  ">dev_name,</if>
+            <if test="devNum != null  and devNum != ''  ">dev_num,</if>
+            <if test="plotId != null  ">plot_id,</if>
+            <if test="devType != null  ">dev_type,</if>
+            <if test="status != null  ">status,</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="devName != null  and devName != ''  ">#{devName},</if>
+            <if test="devNum != null  and devNum != ''  ">#{devNum},</if>
+            <if test="plotId != null  ">#{plotId},</if>
+            <if test="devType != null  ">#{devType},</if>
+            <if test="status != null  ">#{status},</if>
+            <if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCameraDevice" parameterType="LiveStreamingParam">
+        update tb_res_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="devName != null  and devName != ''  ">dev_name = #{devName},</if>
+            <if test="devNum != null  and devNum != ''  ">dev_num = #{devNum},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="devType != null  ">dev_type = #{devType},</if>
+            <if test="status != null  ">status = #{status},</if>
+        </trim>
+        where dev_id = #{devId} and farm_id = #{farmId}
+    </update>
+
+    <delete id="deleteCameraDeviceById" parameterType="LiveStreamingParam">
+        delete from tb_res_device
+        where farm_id = #{farmId} and dev_id = #{devId}
+    </delete>
+
+    <delete id="deleteCameraDeviceByIds" parameterType="String">
+        delete from tb_res_device
+        where farm_id = #{farmId} and dev_id in
+        <foreach item="devId" collection="array" open="(" separator="," close=")">
+            #{devId}
+        </foreach>
+    </delete>
+
+
+    <select id="selectCameraList" parameterType="LiveStreamingParam" resultMap="LiveStreamingParamResult">
+        SELECT
+        tmp1.dev_id,tmp1.dev_name,tmp1.dev_num,tmp1.plot_id,tmp1.`status`,tmp1.farm_id,tmp1.loc,tmp1.plot_name
+        FROM
+        (
+        SELECT
+        r.dev_id,r.dev_name,r.dev_num,r.plot_id,r.`status`,r.farm_id,c.loc,p.plot_name,c.create_time
+        FROM
+        tb_res_device r
+        LEFT JOIN tb_camera_image c ON r.dev_id = c.dev_id
+        LEFT JOIN tb_plot p ON r.plot_id = p.plot_id
+        <where>
+            <if test="devId != null ">and r.dev_id = #{devId}</if>
+            <if test="devName != null  and devName != '' ">and r.dev_name = #{devName}</if>
+            <if test="plotId != null ">and r.plot_id = #{plotId}</if>
+            <if test="devType != null ">and r.dev_type = #{devType}</if>
+            <if test="status != null ">and r.status = #{status}</if>
+            <if test="farmId != null  and farmId != '' ">and r.farm_id = #{farmId}</if>
+        </where>
+        ) tmp1
+        INNER JOIN (
+        SELECT
+        dev_id,max(create_time) AS create_time
+        FROM
+        (
+        SELECT
+        r.dev_id,c.create_time
+        FROM
+        tb_res_device r
+        LEFT JOIN tb_camera_image c ON r.dev_id = c.dev_id
+        <where>
+            <if test="devId != null ">and r.dev_id = #{devId}</if>
+            <if test="devName != null  and devName != '' ">and r.dev_name = #{devName}</if>
+            <if test="plotId != null ">and r.plot_id = #{plotId}</if>
+            <if test="devType != null ">and r.dev_type = #{devType}</if>
+            <if test="status != null ">and r.status = #{status}</if>
+            <if test="farmId != null  and farmId != '' ">and r.farm_id = #{farmId}</if>
+        </where>
+        ) tmp0
+        GROUP BY
+        dev_id
+        ) tmp2
+        ON tmp1.dev_id = tmp2.dev_id AND (tmp1.create_time = tmp2.create_time OR tmp1.create_time IS NULL)
+        ORDER BY
+        dev_id
+    </select>
+
+</mapper>

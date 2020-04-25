@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbSaleTempletMapper">
+    
+    <resultMap type="TbSaleTemplet" id="TbSaleTempletResult">
+        <result property="saleTempletId"    column="sale_templet_id"    />
+        <result property="status"    column="status"    />
+        <result property="farmName"    column="farm_name"    />
+        <result property="farmRemark"    column="farm_remark"    />
+        <result property="mallLink"    column="mall_link"    />
+        <result property="contactWay"    column="contact_way"    />
+        <result property="farmAddress"    column="farm_address"    />
+        <result property="isMap"    column="is_map"    />
+        <result property="isClimate"    column="is_climate"    />
+        <result property="isRealData"    column="is_real_data"    />
+        <result property="isRealPicture"    column="is_real_picture"    />
+        <result property="isActivity"    column="is_activity"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="qrCodeUrl"    column="qr_code_url"    />
+        <result property="corporateName"    column="corporate_name"    />
+        <result property="corporateAddress"    column="corporate_address"    />
+        
+    </resultMap>
+	
+	<sql id="selectTbSaleTempletVo">
+        select sale_templet_id, status, farm_name, farm_remark, mall_link, contact_way, farm_address, is_map, is_climate, is_real_data, is_real_picture, is_activity, create_date, update_date, create_by, update_by, farm_id, qr_code_url,corporate_name,corporate_address from tb_sale_templet
+    </sql>
+	
+    <select id="selectTbSaleTempletList" parameterType="TbSaleTemplet" resultMap="TbSaleTempletResult">
+        <include refid="selectTbSaleTempletVo"/>
+        <where>  
+            <if test="saleTempletId != null "> and sale_templet_id = #{saleTempletId}</if>
+             <if test="status != null "> and status = #{status}</if>
+             <if test="farmName != null  and farmName != '' "> and farm_name = #{farmName}</if>
+             <if test="farmRemark != null  and farmRemark != '' "> and farm_remark = #{farmRemark}</if>
+             <if test="mallLink != null  and mallLink != '' "> and mall_link = #{mallLink}</if>
+             <if test="contactWay != null  and contactWay != '' "> and contact_way = #{contactWay}</if>
+             <if test="farmAddress != null  and farmAddress != '' "> and farm_address = #{farmAddress}</if>
+             <if test="isMap != null "> and is_map = #{isMap}</if>
+             <if test="isClimate != null "> and is_climate = #{isClimate}</if>
+             <if test="isRealData != null "> and is_real_data = #{isRealData}</if>
+             <if test="isRealPicture != null "> and is_real_picture = #{isRealPicture}</if>
+             <if test="isActivity != null "> and is_activity = #{isActivity}</if>
+             <if test="createDate != null "> and create_date = #{createDate}</if>
+             <if test="updateDate != null "> and update_date = #{updateDate}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="qrCodeUrl != null  and qrCodeUrl != '' "> and qr_code_url = #{qrCodeUrl}</if>
+             <if test="corporateName != null  and corporateName != '' "> and corporate_name = #{corporateName}</if>
+             <if test="corporateAddress != null  and corporateAddress != '' "> and corporate_address = #{corporateAddress}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbSaleTempletById" parameterType="Long" resultMap="TbSaleTempletResult">
+        <include refid="selectTbSaleTempletVo"/>
+        where sale_templet_id = #{saleTempletId}
+    </select>
+        
+    <insert id="insertTbSaleTemplet" parameterType="TbSaleTemplet" useGeneratedKeys="true" keyProperty="saleTempletId">
+        insert into tb_sale_templet
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="status != null  ">status,</if>
+			<if test="farmName != null  and farmName != ''  ">farm_name,</if>
+			<if test="farmRemark != null  and farmRemark != ''  ">farm_remark,</if>
+			<if test="mallLink != null  and mallLink != ''  ">mall_link,</if>
+			<if test="contactWay != null  and contactWay != ''  ">contact_way,</if>
+			<if test="farmAddress != null  and farmAddress != ''  ">farm_address,</if>
+			<if test="isMap != null  ">is_map,</if>
+			<if test="isClimate != null  ">is_climate,</if>
+			<if test="isRealData != null  ">is_real_data,</if>
+			<if test="isRealPicture != null  ">is_real_picture,</if>
+			<if test="isActivity != null  ">is_activity,</if>
+			<if test="createDate != null  ">create_date,</if>
+			<if test="updateDate != null  ">update_date,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="qrCodeUrl != null  and qrCodeUrl != ''  ">qr_code_url,</if>
+			<if test="corporateName != null  and corporateName != ''  ">corporate_name,</if>
+			<if test="corporateAddress != null  and corporateAddress != ''  ">corporate_address,</if>
+			
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="status != null  ">#{status},</if>
+			<if test="farmName != null  and farmName != ''  ">#{farmName},</if>
+			<if test="farmRemark != null  and farmRemark != ''  ">#{farmRemark},</if>
+			<if test="mallLink != null  and mallLink != ''  ">#{mallLink},</if>
+			<if test="contactWay != null  and contactWay != ''  ">#{contactWay},</if>
+			<if test="farmAddress != null  and farmAddress != ''  ">#{farmAddress},</if>
+			<if test="isMap != null  ">#{isMap},</if>
+			<if test="isClimate != null  ">#{isClimate},</if>
+			<if test="isRealData != null  ">#{isRealData},</if>
+			<if test="isRealPicture != null  ">#{isRealPicture},</if>
+			<if test="isActivity != null  ">#{isActivity},</if>
+			<if test="createDate != null  ">#{createDate},</if>
+			<if test="updateDate != null  ">#{updateDate},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="qrCodeUrl != null  and qrCodeUrl != ''  ">#{qrCodeUrl},</if>
+			<if test="corporateName != null  and corporateName != ''  ">#{corporateName},</if>
+			<if test="corporateAddress != null  and corporateAddress != ''  ">#{corporateAddress},</if>
+			
+         </trim>
+    </insert>
+	 
+    <update id="updateTbSaleTemplet" parameterType="TbSaleTemplet">
+        update tb_sale_templet
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null  ">status = #{status},</if>
+            <if test="farmName != null  and farmName != ''  ">farm_name = #{farmName},</if>
+            <if test="farmRemark != null  and farmRemark != ''  ">farm_remark = #{farmRemark},</if>
+            <if test="mallLink != null  and mallLink != ''  ">mall_link = #{mallLink},</if>
+            <if test="contactWay != null  and contactWay != ''  ">contact_way = #{contactWay},</if>
+            <if test="farmAddress != null  and farmAddress != ''  ">farm_address = #{farmAddress},</if>
+            <if test="isMap != null  ">is_map = #{isMap},</if>
+            <if test="isClimate != null  ">is_climate = #{isClimate},</if>
+            <if test="isRealData != null  ">is_real_data = #{isRealData},</if>
+            <if test="isRealPicture != null  ">is_real_picture = #{isRealPicture},</if>
+            <if test="isActivity != null  ">is_activity = #{isActivity},</if>
+            <if test="createDate != null  ">create_date = #{createDate},</if>
+            <if test="updateDate != null  ">update_date = #{updateDate},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="qrCodeUrl != null  and qrCodeUrl != ''  ">qr_code_url = #{qrCodeUrl},</if>
+            <if test="corporateName != null  and corporateName != ''  ">corporate_name = #{corporateName},</if>
+            <if test="corporateAddress != null  and corporateAddress != ''  ">corporate_address = #{corporateAddress},</if>
+            
+        </trim>
+        where sale_templet_id = #{saleTempletId}
+    </update>
+
+	<delete id="deleteTbSaleTempletById" parameterType="Long">
+        delete from tb_sale_templet where sale_templet_id = #{saleTempletId}
+    </delete>
+	
+    <delete id="deleteTbSaleTempletByIds" parameterType="String">
+        delete from tb_sale_templet where sale_templet_id in 
+        <foreach item="saleTempletId" collection="array" open="(" separator="," close=")">
+            #{saleTempletId}
+        </foreach>
+    </delete>
+<!--     销售管理-展示模板列表 -->
+    <select id="selectTbMbList" parameterType="org.zcy.agriculture.vo.TbSaleTempletVo" resultType="org.zcy.agriculture.vo.TbSaleTempletVo">
+        SELECT
+			t.sale_templet_id AS saleTempletId,
+			t.qr_code_url AS qrCodeUrl,
+			t2.img_url AS imgUrl,
+			t.farm_name AS farmName
+		FROM
+			tb_sale_templet t
+		LEFT JOIN (SELECT t1.sale_templet_id, group_concat(t1.img_url) AS img_url FROM tb_sale_templet_info t1 WHERE t1.type = 1 GROUP BY t1.sale_templet_id
+		) t2 ON t.sale_templet_id = t2.sale_templet_id
+		WHERE t.status IN (0,1) AND t.farm_id=#{farmId}
+    </select>
+    <!--     批量删除 -->
+    <update id="updateTbSaleTempletBatch" parameterType="java.util.List">
+        update tb_sale_templet SET status = 2,update_date=NOW()
+        WHERE  sale_templet_id IN ( 
+        <foreach collection ="list" item="i" index= "index" separator =",">
+            #{i}
+        </foreach >
+        )
+    </update>
+<!--     根据农场和名称判断是否重复 -->
+    <select id="selectByFarmNameRepeat" resultType="Integer">
+        SELECT
+			count(0) AS cou
+		FROM
+			tb_sale_templet t
+		WHERE
+			t.farm_id=#{farmId}
+		AND t.farm_name =#{farmName}
+		<if test="saleTempletId != null  "> AND t.sale_templet_id != #{saleTempletId} </if>
+    </select>
+</mapper>

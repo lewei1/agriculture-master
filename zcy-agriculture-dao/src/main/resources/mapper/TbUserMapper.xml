@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbUserMapper">
+
+    <resultMap type="TbUser" id="TbUserResult">
+        <result property="userId" column="user_id"/>
+        <result property="userCode" column="user_code"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="companyName" column="company_name"/>
+        <result property="account" column="account"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="headUrl" column="head_url"/>
+        <result property="password" column="password"/>
+    </resultMap>
+
+    <select id="selectVbUserByCode"  resultMap="TbUserResult">
+        SELECT
+            user_code,
+            head_url,
+            nick_name,
+            phone,
+            email,
+            company_name,
+            account,
+            farm_id
+        FROM
+            vb_user
+        WHERE
+            user_code = #{code}
+        and
+            farm_id = #{farmId}
+    </select>
+
+    <select id="getTbUserByPhone" parameterType="string" resultMap="TbUserResult">
+      <include refid="selectTbUserVo"/>
+        where phone = #{phone} and status = 0
+    </select>
+
+    <sql id="selectTbUserVo">
+        select user_id, user_code, nick_name, company_name, account, phone, email, status, create_time, create_by, update_time, update_by, head_url,password from tb_user
+    </sql>
+
+    <select id="selectTbUserList" parameterType="TbUser" resultMap="TbUserResult">
+        <include refid="selectTbUserVo"/>
+        <where>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="userCode != null  ">and user_code  =  #{userCode} </if>
+            <if test="nickName != null  and nickName != '' ">and nick_name  =  #{nickName} </if>
+            <if test="companyName != null  and companyName != '' ">and company_name = #{companyName}</if>
+            <if test="account != null  and account != '' ">and account = #{account}</if>
+            <if test="phone != null  and phone != '' ">and phone =  #{phone} </if>
+            <if test="password != null  and password != '' ">and password = #{password}</if>
+            <if test="email != null  and email != '' ">and email = #{email}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="createBy != null ">and create_by = #{createBy}</if>
+            <if test="updateTime != null ">and update_time = #{updateTime}</if>
+            <if test="updateBy != null ">and update_by = #{updateBy}</if>
+            <if test="status != null ">and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="searchTbUserList" parameterType="TbUserSearchParam" resultMap="TbUserResult">
+        select
+          tu.user_id,
+          tu.user_code,
+          tu.nick_name,
+          tu.company_name,
+          tu.account,
+          tu.phone,
+          tu.email,
+          tu.status,
+          tu.create_time,
+          tu.create_by,
+        tu.update_time,
+        tu.update_by,
+        tu.head_url,
+        tu.password
+        from tb_user tu
+         inner join tb_farm_user tfu
+        ON
+         (tu.nick_name like concat('%', #{searchWords}, '%') || tu.phone like concat('%', #{searchWords}, '%')) AND (ISNULL(tu.status) || tu.status = 0)
+          AND tfu.farm_id = #{farmId}
+          <if test="roleId != null">
+              AND tfu.role_id = #{roleId}
+          </if>
+        AND tfu.user_id = tu.user_id
+    </select>
+
+
+    <select id="selectTbUserById" parameterType="Long" resultMap="TbUserResult">
+        <include refid="selectTbUserVo"/>
+        where user_id = #{userId} AND (ISNULL(status)||status = 0)
+    </select>
+    <select id="selectTbUserByUserCode" parameterType="String" resultMap="TbUserResult">
+        <include refid="selectTbUserVo"/>
+        select * from vb_user t where t.user_code=#{userCode} AND t.farm_id = #{farmId}
+    </select>
+
+    <select id="selectUserByPhoneAndId" resultMap="TbUserResult">
+        SELECT
+            c.*
+        FROM
+            tb_farm_user a
+        LEFT JOIN tb_farm b ON a.farm_id = b.farm_id
+        LEFT JOIN tb_user c ON a.user_id = c.user_id
+        WHERE
+            b.farm_id = #{farmId}
+        AND
+            c.phone = #{phone}
+    </select>
+
+    <insert id="insertTbUser" parameterType="TbUser" useGeneratedKeys="true" keyProperty="userId">
+        insert into tb_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userCode != null ">user_code,</if>
+            <if test="nickName != null  and nickName != ''  ">nick_name,</if>
+            <if test="companyName != null  and companyName != ''  ">company_name,</if>
+            <if test="account != null  and account != ''  ">account,</if>
+            <if test="phone != null  and phone != ''  ">phone,</if>
+            <if test="email != null  and email != ''  ">email,</if>
+            <if test="status != null  ">status,</if>
+            <if test="createTime != null  ">create_time,</if>
+            <if test="createBy != null  ">create_by,</if>
+            <if test="updateTime != null  ">update_time,</if>
+            <if test="updateBy != null  ">update_by,</if>
+            <if test="headUrl != null  and headUrl != ''  ">head_url,</if>
+            <if test="password != null  and password != ''  ">password,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userCode != null ">#{userCode},</if>
+            <if test="nickName != null  and nickName != ''  ">#{nickName},</if>
+            <if test="companyName != null  and companyName != ''  ">#{companyName},</if>
+            <if test="account != null  and account != ''  ">#{account},</if>
+            <if test="phone != null  and phone != ''  ">#{phone},</if>
+            <if test="email != null  and email != ''  ">#{email},</if>
+            <if test="status != null  ">#{status},</if>
+            <if test="createTime != null  ">#{createTime},</if>
+            <if test="createBy != null  ">#{createBy},</if>
+            <if test="updateTime != null  ">#{updateTime},</if>
+            <if test="updateBy != null  ">#{updateBy},</if>
+            <if test="headUrl != null  and headUrl != ''  ">#{headUrl},</if>
+            <if test="password != null  and password != ''  ">#{password},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTbUser" parameterType="TbUser">
+        update tb_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userCode != null ">user_code = #{userCode},</if>
+            <if test="nickName != null  and nickName != ''  ">nick_name = #{nickName},</if>
+            <if test="companyName != null  and companyName != ''  ">company_name = #{companyName},</if>
+            <if test="account != null  and account != ''  ">account = #{account},</if>
+            <if test="phone != null  and phone != ''  ">phone = #{phone},</if>
+            <if test="email != null  and email != ''  ">email = #{email},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="headUrl != null  and headUrl != ''  ">head_url = #{headUrl},</if>
+            <if test="password != null  and password != ''  ">password = #{password},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateUserPasswordByParam" parameterType="PasswordRetrieveParam">
+        UPDATE tb_user
+        SET password = #{newPassword}
+        WHERE
+            phone = #{phone}
+    </update>
+
+    <select id="getUserCountWithPhone" parameterType="String" resultType="Long">
+        select count(*) num from tb_user where (phone = #{phone} || account = #{phone}) AND (ISNULL(status)||status = 0)
+    </select>
+
+    <select id="getUserCountWithEmail" parameterType="String" resultType="Long">
+        select count(*) num from tb_user where (email = #{email} || account = #{email}) AND (ISNULL(status)||status = 0)
+    </select>
+
+    <select id="getUserCountWithRoleId" parameterType="Long" resultType="Long">
+        select count(*) num from tb_farm_user where role_id = #{roleId}
+    </select>
+
+    <delete id="deleteTbUserById" parameterType="Long">
+        update tb_user set tb_user.status = 1,tb_user.update_time= CURRENT_TIMESTAMP WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteTbUserByIds" parameterType="String">
+        delete from tb_user where user_id in
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+    <!--     查询农场所有用户 包过管理员 -->
+    <select id="selectTbUserOrAdminList" parameterType="org.zcy.agriculture.vo.TbUserVo"
+            resultType="org.zcy.agriculture.vo.TbUserVo">
+			SELECT
+				t.user_code AS userCode,
+				t.nick_name AS nickName,
+				t.head_url AS headUrl
+			FROM
+				vb_user t 
+			WHERE t.farm_id = #{farmId}
+    </select>
+
+    <select id="getUserRoleByUserId" resultType="org.zcy.agriculture.vo.TbUserRoleVo">
+        select
+          tfu.user_id as userId,
+          tr.role_id as roleId,
+          tr.name as roleName
+        from tb_farm_user tfu
+        inner join tb_res_role tr
+        on tfu.user_id = #{userId} and tfu.farm_id = #{farmId} and tfu.role_id = tr.role_id;
+    </select>
+</mapper>

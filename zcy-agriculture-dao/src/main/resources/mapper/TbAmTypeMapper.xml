@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbAmTypeMapper">
+    
+    <resultMap type="TbAmType" id="TbAmTypeResult">
+        <result property="machineTypeId"    column="machine_type_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectTbAmTypeVo">
+        select machine_type_id, farm_id, type_name, create_time, update_time from tb_am_type
+    </sql>
+	
+    <select id="selectTbAmTypeList" parameterType="TbAmType" resultMap="TbAmTypeResult">
+        <include refid="selectTbAmTypeVo"/>
+        <where>  
+            <if test="machineTypeId != null "> and machine_type_id = #{machineTypeId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="typeName != null  and typeName != '' "> and type_name = #{typeName}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+         </where>
+    </select>
+
+
+    <select id="selectTbAmTypeByClass" parameterType="TbAmType" resultMap="TbAmTypeResult">
+        <include refid="selectTbAmTypeVo"/>
+        where machine_type_id = #{machineTypeId} and farm_id = #{farmId}
+    </select>
+
+
+    <select id="selectTbAmTypeById" parameterType="Long" resultMap="TbAmTypeResult">
+        <include refid="selectTbAmTypeVo"/>
+        where machine_type_id = #{machineTypeId}
+    </select>
+        
+    <insert id="insertTbAmType" parameterType="TbAmType" useGeneratedKeys="true" keyProperty="machineTypeId">
+        insert into tb_am_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="typeName != null  and typeName != ''  ">type_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="typeName != null  and typeName != ''  ">#{typeName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbAmType" parameterType="TbAmType">
+        update tb_am_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="typeName != null  and typeName != ''  ">type_name = #{typeName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+        </trim>
+        where machine_type_id = #{machineTypeId}
+    </update>
+
+	<delete id="deleteTbAmTypeById" parameterType="TbAmType">
+        delete from tb_am_type where machine_type_id = #{machineTypeId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbAmTypeByIds" parameterType="String">
+        delete from tb_am_type where machine_type_id in 
+        <foreach item="machineTypeId" collection="array" open="(" separator="," close=")">
+            #{machineTypeId}
+        </foreach>
+    </delete>
+    
+</mapper>

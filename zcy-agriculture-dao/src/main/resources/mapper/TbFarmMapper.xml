@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.farm.TbFarmMapper">
+    
+    <resultMap type="TbFarm" id="TbFarmResult">
+        <result property="farmId"    column="farm_id"    />
+        <result property="farmName"    column="farm_name"    />
+        <result property="country"    column="country"    />
+        <result property="region"    column="region"    />
+        <result property="farmSequence"    column="farm_sequence"    />
+        <result property="farmStatus"    column="farm_status"    />
+        <result property="longitude"    column="longitude"    />
+        <result property="latitude"    column="latitude"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+	
+	<sql id="selectTbFarmVo">
+        select farm_id, farm_name, country, region, farm_sequence, farm_status, longitude, latitude,  create_time, create_by, update_time, update_by from tb_farm
+    </sql>
+	
+    <select id="selectTbFarmList" parameterType="TbFarm" resultMap="TbFarmResult">
+        <include refid="selectTbFarmVo"/>
+        <where>  
+            <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="farmName != null  and farmName != '' "> and farm_name = #{farmName}</if>
+             <if test="country != null  and country != '' "> and country = #{country}</if>
+             <if test="region != null  and region != '' "> and region = #{region}</if>
+             <if test="farmSequence != null "> and farm_sequence = #{farmSequence}</if>
+             <if test="farmStatus != null "> and farm_status = #{farmStatus}</if>
+             <if test="longitude != null "> and longitude = #{longitude}</if>
+             <if test="latitude != null "> and latitude = #{latitude}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbFarmById" parameterType="String" resultMap="TbFarmResult">
+        <include refid="selectTbFarmVo"/>
+        where farm_id = #{farmId}
+    </select>
+<!--     根据农场ID查询农场所在地 -->
+    <select id="selectTbFarmByCity" parameterType="String" resultType="HashMap">
+        SELECT
+			t.farm_id AS farmId,
+			t.farm_name AS farmName,
+			t1.dict_label AS dictLabel
+		FROM
+			tb_farm t
+		INNER JOIN sys_dict_data t1 ON t1.dict_type = 'sys_address'
+		AND t.region = t1.dict_value AND t.farm_id=#{farmId}
+    </select>
+
+    <resultMap id="FarmUserDetailResult" type="FarmUserRelationVo">
+        <result property="farmId"    column="farm_id"    />
+        <result property="farmName"    column="farm_name"    />
+        <result property="region"    column="region"    />
+        <result property="id"    column="id"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="roleId"    column="role_id"    />
+        <result property="roleName"    column="roleName"    />
+    </resultMap>
+
+
+    <select id="selectMerchantAllFarmList" parameterType="String" resultMap="FarmUserDetailResult">
+        SELECT
+            b.farm_id,
+            b.farm_name,
+            b.region,
+            c.merchant_id id,
+            c.nick_name
+        FROM
+            tb_farm_merchant a
+        LEFT JOIN tb_farm b ON a.farm_id = b.farm_id
+        LEFT JOIN tb_merchant c ON a.merchant_id = c.merchant_id
+        WHERE
+            b.farm_status = 0
+        AND
+            c.phone = #{phone}
+    </select>
+
+    <select id="selectUserAllFarmList" parameterType="String" resultMap="FarmUserDetailResult">
+        SELECT
+            b.farm_id,
+            b.farm_name,
+            b.region,
+            c.user_id id,
+            c.nick_name,
+            d.role_id,
+            d.name as roleName
+        FROM
+            tb_farm_user a
+        LEFT JOIN tb_farm b ON a.farm_id = b.farm_id
+        LEFT JOIN tb_user c ON a.user_id = c.user_id
+        LEFT JOIN tb_res_role d ON a.role_id = d.role_id
+        WHERE
+            b.farm_status = 0
+        AND
+            c.phone = #{phone}
+        AND
+            c.status = 0
+    </select>
+        
+    <insert id="insertTbFarm" parameterType="TbFarm">
+        insert into tb_farm
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="farmName != null  and farmName != ''  ">farm_name,</if>
+			<if test="country != null  and country != ''  ">country,</if>
+			<if test="region != null  and region != ''  ">region,</if>
+			<if test="farmSequence != null  ">farm_sequence,</if>
+			<if test="farmStatus != null  ">farm_status,</if>
+			<if test="longitude != null  ">longitude,</if>
+			<if test="latitude != null  ">latitude,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="farmName != null  and farmName != ''  ">#{farmName},</if>
+			<if test="country != null  and country != ''  ">#{country},</if>
+			<if test="region != null  and region != ''  ">#{region},</if>
+			<if test="farmSequence != null  ">#{farmSequence},</if>
+			<if test="farmStatus != null  ">#{farmStatus},</if>
+            <if test="longitude != null  "> #{longitude},</if>
+            <if test="latitude != null  "> #{latitude},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbFarm" parameterType="TbFarm">
+        update tb_farm
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmName != null  and farmName != ''  ">farm_name = #{farmName},</if>
+            <if test="country != null  and country != ''  ">country = #{country},</if>
+            <if test="region != null  and region != ''  ">region = #{region},</if>
+            <if test="farmSequence != null  ">farm_sequence = #{farmSequence},</if>
+            <if test="farmStatus != null  ">farm_status = #{farmStatus},</if>
+            <if test="longitude != null  ">longitude = #{longitude},</if>
+            <if test="latitude != null  ">latitude = #{latitude},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+        </trim>
+        where farm_id = #{farmId}
+    </update>
+
+	<delete id="deleteTbFarmById" parameterType="String">
+        delete from tb_farm where farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbFarmByIds" parameterType="String">
+        delete from tb_farm where farm_id in 
+        <foreach item="farmId" collection="array" open="(" separator="," close=")">
+            #{farmId}
+        </foreach>
+    </delete>
+    
+</mapper>

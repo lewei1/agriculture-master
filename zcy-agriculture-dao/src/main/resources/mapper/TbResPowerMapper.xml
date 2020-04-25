@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbResPowerMapper">
+    
+    <resultMap type="TbResPower" id="TbResPowerResult">
+        <result property="powerId"    column="power_id"    />
+        <result property="powerCode"    column="power_code"    />
+        <result property="name"    column="name"    />
+        <result property="status"    column="status"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="uri"    column="uri"    />
+        <result property="level"    column="level"    />
+    </resultMap>
+	
+	<sql id="selectTbResPowerVo">
+        power_id, power_code, name, status, parent_id, uri, level from tb_res_power
+    </sql>
+	
+    <select id="selectTbResPowerList" parameterType="TbResPower" resultMap="TbResPowerResult">
+        select
+        <include refid="selectTbResPowerVo"/>
+        where level in (1,2,3)
+    </select>
+    
+    <select id="selectTbResPowerById" parameterType="Long" resultMap="TbResPowerResult">
+        select
+        <include refid="selectTbResPowerVo"/>
+        where power_id = #{powerId}
+    </select>
+        
+    <insert id="insertTbResPower" parameterType="TbResPower" useGeneratedKeys="true" keyProperty="powerId">
+        insert into tb_res_power
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="powerCode != null  and powerCode != ''  ">power_code,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="status != null  ">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="powerCode != null  and powerCode != ''  ">#{powerCode},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="status != null  ">#{status},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbResPower" parameterType="TbResPower">
+        update tb_res_power
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="powerCode != null  and powerCode != ''  ">power_code = #{powerCode},</if>
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="status != null  ">status = #{status},</if>
+        </trim>
+        where power_id = #{powerId}
+    </update>
+
+	<delete id="deleteTbResPowerById" parameterType="Long">
+        delete from tb_res_power where power_id = #{powerId}
+    </delete>
+	
+    <select id="getCountWithPowerID" parameterType="Long" resultType="Long">
+         select count(*) num from tb_res_power WHERE power_id = #{powerId} AND (ISNULL(status)||status = 0)
+    </select>
+
+    <delete id="deleteTbResPowerByIds" parameterType="String">
+        delete from tb_res_power where power_id in 
+        <foreach item="powerId" collection="array" open="(" separator="," close=")">
+            #{powerId}
+        </foreach>
+    </delete>
+
+    <select id="getPowerChilds" parameterType="long" resultMap="TbResPowerResult">
+        select
+        <include refid="selectTbResPowerVo"/>
+        where power_id = #{powerId}
+    </select>
+
+    <select id="getPowerChildsBylevel" parameterType="int" resultMap="TbResPowerResult">
+        select
+        <include refid="selectTbResPowerVo"/>
+        where level = #{level}
+    </select>
+
+    <select id="getPowerListByRoleId" parameterType="long" resultMap="TbResPowerResult">
+        select
+            p.power_id,
+            p.power_code,
+            p.name,
+            p.status,
+            p.parent_id,
+            p.uri,
+            p.level
+        from
+          tb_res_power p
+        left join
+          tb_dic_role_power rp on rp.power_id = p.power_id
+        where
+          rp.role_id = #{roleId}
+    </select>
+
+    <select id="getCommonPowerList" resultType="string">
+        select
+          uri
+        from tb_res_power
+        where parent_id between 1 and 18
+        and level = 4
+    </select>
+</mapper>

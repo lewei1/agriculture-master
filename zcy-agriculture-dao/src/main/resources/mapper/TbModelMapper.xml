@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.model.TbModelMapper">
+    
+    <resultMap type="TbModel" id="TbModelResult">
+        <result property="modelId"    column="model_id"    />
+        <result property="modelName"    column="model_name"    />
+        <result property="modelType"    column="model_type"    />
+        <result property="cropCategoryId"    column="crop_category_id"    />
+        <result property="plantStandardId"    column="plant_standard_id"    />
+        <result property="plantEnvironmentId"    column="plant_environment_id"    />
+        <result property="modelStatus"    column="model_status"    />
+        <result property="modelUseTime"    column="model_use_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbModelVo">
+        select model_id, model_name, model_type, crop_category_id, plant_standard_id, plant_environment_id, model_status, model_use_time, create_time, create_by, update_time, update_by, farm_id from tb_model
+    </sql>
+	
+    <select id="selectTbModelList" parameterType="TbModel" resultMap="TbModelResult">
+        <include refid="selectTbModelVo"/>
+        <where>  
+            <if test="modelId != null "> and model_id = #{modelId}</if>
+             <if test="modelName != null  and modelName != '' "> and model_name = #{modelName}</if>
+             <if test="modelType != null  and modelType != '' "> and model_type = #{modelType}</if>
+             <if test="cropCategoryId != null "> and crop_category_id = #{cropCategoryId}</if>
+             <if test="plantStandardId != null "> and plant_standard_id = #{plantStandardId}</if>
+             <if test="plantEnvironmentId != null "> and plant_environment_id = #{plantEnvironmentId}</if>
+             <if test="modelStatus != null "> and model_status = #{modelStatus}</if>
+             <if test="modelUseTime != null "> and model_use_time = #{modelUseTime}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+
+    <select id="selectModelOverviewList" parameterType="ModelOverviewParam" resultType="ModelOverviewVo">
+        SELECT
+            a.crop_category_id cropCategoryId,
+            b.category_name categoryName,
+            COUNT(a.model_id) modelNumber,
+            b.sample_picture samplePicture
+        FROM
+            tb_model a LEFT JOIN tb_crop_category b ON a.crop_category_id = b.crop_category_id
+        WHERE
+            b.category_status = 0
+        AND
+            a.model_status = 0
+        and
+            a.farm_id = #{farmId}
+        <if test="categoryName != null and categoryName != ''">AND b.category_name like concat('%', #{categoryName}, '%')</if>
+        <if test="plantStandardId != null">AND a.plant_standard_id = #{plantStandardId}</if>
+        <if test="plantEnvironmentId != null ">AND a.plant_environment_id = #{plantEnvironmentId}</if>
+        GROUP BY
+            a.crop_category_id
+    </select>
+
+    <select id="selectModelStatistics" parameterType="String" resultType="ModelStatisticsVo">
+        SELECT
+            IFNULL(SUM(CASE WHEN a.model_type = 'F' THEN 1 ELSE 0 END),0) farmModelNumber,
+            COUNT(a.model_id) totalModelNumber
+        FROM
+            tb_model a
+        WHERE
+            a.model_status = 0
+        AND
+            a.farm_id = #{farmId}
+    </select>
+
+    <resultMap id="ModelDetailResult" type="ModelDetailVo">
+        <result property="modelId"    column="model_id"    />
+        <result property="modelName"    column="model_name"    />
+        <result property="modelType"    column="model_type"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="plantStandardId"    column="plant_standard_id"    />
+        <result property="plantEnvironmentId"    column="plant_environment_id"    />
+        <result property="modelUseTime"    column="model_use_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <collection property="periodAndFarmingsList" ofType="TbModelPeriodAndFarmings">
+            <result property="periodId"    column="period_id"    />
+            <result property="periodName"    column="period_name"    />
+            <result property="startTime"    column="start_time"    />
+            <result property="endTime"    column="end_time"    />
+            <collection property="farmingList" ofType="TbModelPeriodFarming">
+                <result property="plantType"    column="plant_type"    />
+                <result property="plantDay"    column="plant_day"    />
+                <result property="farmingTime"    column="farmingTime"    />
+                <result property="farmingTypeName"    column="farming_type_name"    />
+                <result property="farmingRequirements"    column="farming_requirements"    />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectModelDetail" resultMap="ModelDetailResult">
+        SELECT
+            a.model_id,
+            a.model_name,
+            c.category_name,
+            a.plant_standard_id,
+            a.plant_environment_id,
+            a.create_by,
+            a.model_use_time,
+            b.period_id,
+            b.period_name,
+            b.start_time,
+            b.end_time,
+            d.plant_type,
+            d.plant_day,
+            CONCAT(d.plant_type,d.plant_day,"天") farmingTime,
+            d.farming_type_name,
+            d.farming_requirements
+        FROM
+            tb_model a
+        LEFT JOIN tb_model_period b ON a.model_id = b.model_id
+        LEFT JOIN tb_crop_category c ON a.crop_category_id = c.crop_category_id
+        LEFT JOIN (
+            SELECT
+                pf.period_id,
+                pf.plant_type,
+                pf.plant_day,
+                ft.farming_type_name,
+                pf.farming_requirements
+            FROM
+                tb_model_period_farming pf
+            LEFT JOIN tb_farming_type ft ON pf.farming_type_id = ft.farming_type_id
+            WHERE
+                ft.farming_type_status = 0
+        ) d ON b.period_id = d.period_id
+        WHERE
+            a.model_status = 0
+        AND
+            c.category_status = 0
+        AND
+            a.model_id = #{modelId}
+        AND
+            a.farm_id = #{farmId}
+    </select>
+
+    
+    <select id="selectTbModelById" parameterType="Long" resultMap="TbModelResult">
+        <include refid="selectTbModelVo"/>
+        where model_id = #{modelId}
+    </select>
+        
+    <insert id="insertTbModel" parameterType="TbModel" useGeneratedKeys="true" keyProperty="modelId">
+        insert into tb_model
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="modelName != null  and modelName != ''  ">model_name,</if>
+			<if test="modelType != null  and modelType != ''  ">model_type,</if>
+			<if test="cropCategoryId != null  ">crop_category_id,</if>
+			<if test="plantStandardId != null  ">plant_standard_id,</if>
+			<if test="plantEnvironmentId != null  ">plant_environment_id,</if>
+			<if test="modelStatus != null  ">model_status,</if>
+			<if test="modelUseTime != null  ">model_use_time,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="modelName != null  and modelName != ''  ">#{modelName},</if>
+			<if test="modelType != null  and modelType != ''  ">#{modelType},</if>
+			<if test="cropCategoryId != null  ">#{cropCategoryId},</if>
+			<if test="plantStandardId != null  ">#{plantStandardId},</if>
+			<if test="plantEnvironmentId != null  ">#{plantEnvironmentId},</if>
+			<if test="modelStatus != null  ">#{modelStatus},</if>
+			<if test="modelUseTime != null  ">#{modelUseTime},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbModel" parameterType="TbModel">
+        update tb_model
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="modelName != null  and modelName != ''  ">model_name = #{modelName},</if>
+            <if test="plantStandardId != null  ">plant_standard_id = #{plantStandardId},</if>
+            <if test="plantEnvironmentId != null  ">plant_environment_id = #{plantEnvironmentId},</if>
+            <if test="modelStatus != null  ">model_status = #{modelStatus},</if>
+            <if test="modelUseTime != null  ">model_use_time = #{modelUseTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where model_id = #{modelId}
+    </update>
+
+	<delete id="deleteTbModelById" parameterType="Long">
+        delete from tb_model where model_id = #{modelId}
+    </delete>
+	
+    <delete id="deleteTbModelByIds" parameterType="String">
+        delete from tb_model where model_id in 
+        <foreach item="modelId" collection="array" open="(" separator="," close=")">
+            #{modelId}
+        </foreach>
+    </delete>
+<!--     添加标准计划后 模型使用次数+1 -->
+    <update id="updateTbModelByModelUseTime" parameterType="List">
+        update tb_model SET model_use_time = model_use_time+1
+        where model_id IN (SELECT DISTINCT t.model_id FROM tb_model_period t INNER JOIN tb_model_period_farming t1 ON t.period_id=t1.period_id AND t1.farming_id in (
+            	 <foreach collection ="list" item="item" index= "index" separator =",">
+		            #{item} 
+		        </foreach > ) )
+    </update>
+</mapper>

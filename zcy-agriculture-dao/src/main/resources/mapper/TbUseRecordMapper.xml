@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbUseRecordMapper">
+    
+    <resultMap type="TbUseRecord" id="TbUseRecordResult">
+        <result property="machineRecordId"    column="machine_record_id"    />
+        <result property="plan"    column="plan"    />
+        <result property="person"    column="person"    />
+        <result property="costTime"    column="cost_time"    />
+        <result property="machineId"    column="machine_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectTbUseRecordVo">
+        select machine_record_id, plan, person, cost_time, machine_id, create_time, update_time from tb_use_record
+    </sql>
+	
+    <select id="selectTbUseRecordList" parameterType="TbUseRecord" resultMap="TbUseRecordResult">
+        <include refid="selectTbUseRecordVo"/>
+        <where>  
+            <if test="machineRecordId != null "> and machine_record_id = #{machineRecordId}</if>
+             <if test="plan != null  and plan != '' "> and plan = #{plan}</if>
+             <if test="person != null  and person != '' "> and person = #{person}</if>
+             <if test="costTime != null  and costTime != '' "> and cost_time = #{costTime}</if>
+             <if test="machineId != null "> and machine_id = #{machineId}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbUseRecordById" parameterType="Long" resultMap="TbUseRecordResult">
+        <include refid="selectTbUseRecordVo"/>
+        where machine_record_id = #{machineRecordId}
+    </select>
+        
+    <insert id="insertTbUseRecord" parameterType="TbUseRecord" useGeneratedKeys="true" keyProperty="machineRecordId">
+        insert into tb_use_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="plan != null  and plan != ''  ">plan,</if>
+			<if test="person != null  and person != ''  ">person,</if>
+			<if test="costTime != null  and costTime != ''  ">cost_time,</if>
+			<if test="machineId != null  ">machine_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="plan != null  and plan != ''  ">#{plan},</if>
+			<if test="person != null  and person != ''  ">#{person},</if>
+			<if test="costTime != null  and costTime != ''  ">#{costTime},</if>
+			<if test="machineId != null  ">#{machineId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbUseRecord" parameterType="TbUseRecord">
+        update tb_use_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plan != null  and plan != ''  ">plan = #{plan},</if>
+            <if test="person != null  and person != ''  ">person = #{person},</if>
+            <if test="costTime != null  and costTime != ''  ">cost_time = #{costTime},</if>
+            <if test="machineId != null  ">machine_id = #{machineId},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+        </trim>
+        where machine_record_id = #{machineRecordId}
+    </update>
+
+	<delete id="deleteTbUseRecordById" parameterType="Long">
+        delete from tb_use_record where machine_record_id = #{machineRecordId}
+    </delete>
+	
+    <delete id="deleteTbUseRecordByIds" parameterType="String">
+        delete from tb_use_record where machine_record_id in 
+        <foreach item="machineRecordId" collection="array" open="(" separator="," close=")">
+            #{machineRecordId}
+        </foreach>
+    </delete>
+    
+</mapper>

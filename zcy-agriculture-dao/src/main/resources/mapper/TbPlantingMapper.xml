@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbPlantingMapper">
+    
+    <resultMap type="TbPlanting" id="TbPlantingResult">
+        <result property="plantingId"    column="planting_id"    />
+        <result property="cropCategoryId"    column="crop_category_id"    />
+        <result property="cropTypeId"    column="crop_type_id"    />
+        <result property="plantTime"    column="plant_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="plantStandard"    column="plant_standard"    />
+        <result property="plantingStatus"    column="planting_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="subPlotId"    column="sub_plot_id"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlantingVo">
+        select planting_id, crop_category_id, crop_type_id, plant_time, end_time, plant_standard, planting_status, create_time, create_by, update_time, update_by, plot_id, sub_plot_id, farm_id from tb_planting
+    </sql>
+	
+    <select id="selectTbPlantingList" parameterType="TbPlanting" resultMap="TbPlantingResult">
+        <include refid="selectTbPlantingVo"/>
+        <where>  
+            <if test="plantingId != null "> and planting_id = #{plantingId}</if>
+             <if test="cropCategoryId != null "> and crop_category_id = #{cropCategoryId}</if>
+             <if test="cropTypeId != null "> and crop_type_id = #{cropTypeId}</if>
+             <if test="plantTime != null "> and plant_time = #{plantTime}</if>
+             <if test="endTime != null "> and end_time = #{endTime}</if>
+             <if test="plantStandard != null  and plantStandard != '' "> and plant_standard = #{plantStandard}</if>
+             <if test="plantingStatus != null "> and planting_status = #{plantingStatus}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="subPlotId != null "> and sub_plot_id = #{subPlotId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlantingById" parameterType="Long" resultMap="TbPlantingResult">
+        <include refid="selectTbPlantingVo"/>
+        where planting_id = #{plantingId}
+    </select>
+        
+    <insert id="insertTbPlanting" parameterType="TbPlanting" useGeneratedKeys="true" keyProperty="plantingId">
+        insert into tb_planting
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="cropCategoryId != null  ">crop_category_id,</if>
+			<if test="cropTypeId != null  ">crop_type_id,</if>
+			<if test="plantTime != null  ">plant_time,</if>
+			<if test="endTime != null  ">end_time,</if>
+			<if test="plantStandard != null  and plantStandard != ''  ">plant_standard,</if>
+			<if test="plantingStatus != null  ">planting_status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="subPlotId != null  ">sub_plot_id,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="cropCategoryId != null  ">#{cropCategoryId},</if>
+			<if test="cropTypeId != null  ">#{cropTypeId},</if>
+			<if test="plantTime != null  ">#{plantTime},</if>
+			<if test="endTime != null  ">#{endTime},</if>
+			<if test="plantStandard != null  and plantStandard != ''  ">#{plantStandard},</if>
+			<if test="plantingStatus != null  ">#{plantingStatus},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="subPlotId != null  ">#{subPlotId},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbPlanting" parameterType="TbPlanting">
+        update tb_planting
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cropCategoryId != null  ">crop_category_id = #{cropCategoryId},</if>
+            <if test="cropTypeId != null  ">crop_type_id = #{cropTypeId},</if>
+            <if test="plantTime != null  ">plant_time = #{plantTime},</if>
+            <if test="endTime != null  ">end_time = #{endTime},</if>
+            <if test="plantStandard != null  and plantStandard != ''  ">plant_standard = #{plantStandard},</if>
+            <if test="plantingStatus != null  ">planting_status = #{plantingStatus},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="subPlotId != null  ">sub_plot_id = #{subPlotId},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where planting_id = #{plantingId}
+    </update>
+
+	<delete id="deleteTbPlantingById" parameterType="Long">
+        delete from tb_planting where planting_id = #{plantingId}
+    </delete>
+	
+    <delete id="deleteTbPlantingByIds" parameterType="String">
+        delete from tb_planting where planting_id in 
+        <foreach item="plantingId" collection="array" open="(" separator="," close=")">
+            #{plantingId}
+        </foreach>
+    </delete>
+<!--     种植管理 概览 -->
+    <select id="selectByNncultivatedList" parameterType="org.zcy.agriculture.vo.TbPlantingVo" resultType="org.zcy.agriculture.vo.TbPlantingVo">
+        SELECT
+        	t2.farm_id AS farmId,
+			t2.plot_name AS plotName,
+			t1.plot_id AS plotId,
+			t1.sub_plot_id AS subPlotId,
+			t1.sub_plot_name AS subPlotName,
+		    t1.sub_plot_person AS subPlotUserId,
+			t3.planting_id AS plantingId,
+			t3.plant_time AS plantTime,
+			t3.end_time AS endTime,
+			t3.plant_standard AS plantStandard,
+			t3.planting_status AS plantingStatus,
+			t4.sample_picture AS samplePicture,
+			t4.category_name AS categoryName,
+			(SELECT u.nick_name FROM vb_user u WHERE t1.sub_plot_person = u.user_code AND u.farm_id = #{farmId} ) AS nickName,
+			t1.sub_plot_acreage AS subPlotAcreage
+		FROM
+			tb_sub_plot t1
+		INNER JOIN tb_plot t2 ON t1.plot_id = t2.plot_id AND t2.farm_id = #{farmId}
+		LEFT JOIN tb_planting t3 ON t1.sub_plot_id = t3.sub_plot_id AND t3.planting_status = 0
+		LEFT JOIN tb_crop_category t4 ON t3.crop_category_id = t4.crop_category_id
+		WHERE
+			t1.sub_plot_status = 0
+		AND t2.plot_status = 0
+		<if test="plantingStatus == 1 "> AND t3.planting_id IS NULL</if>
+		<if test="plotId != null "> AND t2.plot_id =#{plotId}</if>
+<!-- 		AND t1.sub_plot_person = #{subPlotPerson} -->
+    </select>
+    <!--     种植管理  子地块种植列表 -->
+    <select id="selectByPlantingAllList" parameterType="org.zcy.agriculture.vo.TbPlantingVo" resultType="org.zcy.agriculture.vo.TbPlantingVo">
+        SELECT
+			t1.planting_id AS plantingId,
+			t1.plant_time AS plantTime,
+			t1.end_time AS endTime,
+			t1.plant_standard AS plantStandard,
+			t1.planting_status AS plantingStatus,
+			t2.sample_picture AS samplePicture,
+			t2.category_name AS categoryName,
+			t1.plot_id AS plotId,
+			t1.sub_plot_id AS subPlotId
+		FROM
+		tb_planting t1 
+		INNER JOIN tb_crop_category t2 ON t1.crop_category_id = t2.crop_category_id
+		AND t1.planting_status IN (0,2)
+<!-- 		AND t1.sub_plot_person = #{subPlotPerson} -->
+		<if test="farmId != null  and farmId != '' "> and t1.farm_id = #{farmId}</if>
+		<if test="plotId != null "> and t1.plot_id = #{plotId}</if>
+        <if test="subPlotId != null "> and t1.sub_plot_id = #{subPlotId}</if>
+        <if test="plantingStatus != null "> and t1.planting_status = #{plantingStatus}</if>
+        ORDER BY t1.planting_id DESC
+    </select>
+<!--     批量查询地块是否已经在种植中。。。 -->
+    <select id="selectByPlantingStatus" parameterType="java.util.List" resultType="Integer">
+        SELECT
+			COUNT(0)
+		FROM
+		tb_planting t1 
+		WHERE t1.planting_status =0 
+		<if test="plantingList != null and plantingList.size()>0 and plantingList.get(0).subPlotId != null">
+			AND t1.sub_plot_id IN 
+			(
+	          <foreach collection ="plantingList" item="tti" index= "index" separator =",">
+	              #{tti.subPlotId}
+	          </foreach >
+	        )
+		</if>
+		<if test="plantingList != null and plantingList.size()>0 and plantingList.get(0).plantingId != null">
+			AND t1.planting_id IN 
+			(
+	          <foreach collection ="plantingList" item="tti" index= "index" separator =",">
+	              #{tti.plantingId}
+	          </foreach >
+	        )
+		</if>
+		
+    </select>
+<!--     批量种植 -->
+    <insert id ="insertByPlantingBatch" parameterType="java.util.List" >
+         insert into tb_planting
+         	(crop_category_id, crop_type_id, plant_time,end_time,plant_standard,update_time,create_by,update_by,plot_id,sub_plot_id,farm_id)
+         values
+          <foreach collection ="plantingList" item="p" index= "index" separator =",">
+              (#{p.cropCategoryId}, #{p.cropTypeId},#{p.plantTime},#{p.endTime},#{p.plantStandard}
+              ,#{p.updateTime},#{p.createBy},#{p.updateBy},#{p.plotId},#{p.subPlotId}
+              ,#{p.farmId})
+          </foreach >
+   </insert >
+<!--    批量结束种植 -->
+   <update id="updateTbPlantingBatch" parameterType="java.util.List">
+        update tb_planting SET planting_status = 2 , update_by=#{plantingList[0].updateBy},update_time=#{plantingList[0].updateTime}
+        WHERE  planting_id IN ( 
+        <foreach collection ="plantingList" item="tti" index= "index" separator =",">
+            #{tti.plantingId}
+        </foreach >
+        )
+    </update>
+    <!--     根据地块ID查询农作物和负责人 -->
+    <select id="selectByCategoryNameList" parameterType="Long" resultType="org.zcy.agriculture.vo.TbPlantingVo">
+        SELECT DISTINCT
+			t1.category_name AS categoryName,
+			t3.nick_name AS nickName
+		FROM
+			tb_planting t
+		INNER JOIN tb_crop_category t1 ON t.crop_category_id = t1.crop_category_id
+		INNER JOIN tb_sub_plot t2 ON t.sub_plot_id = t2.sub_plot_id
+		INNER JOIN vb_user t3 ON t2.sub_plot_person = t3.user_code AND t3.farm_id=t.farm_id
+		WHERE
+			t2.plot_id = #{plotId}
+		AND t.planting_status = 0
+    </select>
+    
+     <select id="selectListBySubPlotIds" resultType="org.zcy.agriculture.vo.TbPlantingVo">
+        SELECT
+		 t.sub_plot_id as subPlotId, 
+		 t.plot_id as plotId,
+		 t1.nick_name as nickName, 
+		 t1.user_code as subPlotUserId,
+		 t2.plant_time as plantTime,
+		 t2.planting_id as plantingId
+		FROM
+		 tb_sub_plot t
+		LEFT JOIN vb_user t1 ON t.sub_plot_person = t1.user_code AND t1.farm_id=#{farmId}
+		LEFT JOIN tb_planting t2 ON t.sub_plot_id = t2.sub_plot_id
+		WHERE
+		 t.sub_plot_id in (
+		 <foreach collection ="list" item="item" index= "index" separator =",">
+            #{item} 
+        </foreach > )
+		AND t2.planting_status = 0
+    </select>
+</mapper>

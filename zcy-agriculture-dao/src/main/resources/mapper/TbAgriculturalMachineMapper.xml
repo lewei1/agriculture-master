@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbAgriculturalMachineMapper">
+    
+    <resultMap type="TbAgriculturalMachine" id="TbAgriculturalMachineResult">
+        <result property="machineId"    column="machine_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="machineTypeId"    column="machine_type_id"    />
+        <result property="name"    column="name"    />
+        <result property="model"    column="model"    />
+        <result property="price"    column="price"    />
+        <result property="image"    column="image"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="machineTypeName"    column="machine_type_name"    />
+    </resultMap>
+	
+	<sql id="selectTbAgriculturalMachineVo">
+        select machine_id, farm_id, machine_type_id, name, model, price, image, create_time, update_time from tb_agricultural_machine
+    </sql>
+	
+    <select id="selectTbAgriculturalMachineList" parameterType="TbAgriculturalMachine" resultMap="TbAgriculturalMachineResult">
+        select am.machine_id, am.farm_id, am.machine_type_id, am.name, am.model, am.price, am.image, am.create_time, am.update_time,aty.type_name as machine_type_name from tb_agricultural_machine am
+        left join tb_am_type aty on am.machine_type_id = aty.machine_type_id
+        <where>
+            am.farm_id = #{farmId}
+            <if test="machineId != null "> and am.machine_id = #{machineId}</if>
+             <if test="machineTypeId != null "> and am.machine_type_id = #{machineTypeId}</if>
+            <if test="name != null  and name != '' "> and am.name LIKE CONCAT('%',#{name},'%')</if>
+             <if test="model != null  and model != '' "> and am.model = #{model}</if>
+             <if test="price != null "> and am.price = #{price}</if>
+             <if test="image != null  and image != '' "> and am.image = #{image}</if>
+             <if test="createTime != null "> and am.create_time = #{createTime}</if>
+             <if test="updateTime != null "> and am.update_time = #{updateTime}</if>
+         </where>
+    </select>
+
+
+    <select id="selectTbAgriculturalMachineById" parameterType="Long" resultMap="TbAgriculturalMachineResult">
+        <include refid="selectTbAgriculturalMachineVo"/>
+        where machine_id = #{machineId}
+    </select>
+
+    <select id="selectTbAgriculturalMachineByClass" parameterType="TbAgriculturalMachine" resultMap="TbAgriculturalMachineResult">
+        <include refid="selectTbAgriculturalMachineVo"/>
+        where machine_id = #{machineId} and farm_id = #{farmId}
+    </select>
+
+    <select id="selectTbAgriculturalMachineImg" resultMap="TbAgriculturalMachineResult">
+        <include refid="selectTbAgriculturalMachineVo"/>
+        where farm_id is null and machine_type_id is null
+    </select>
+
+    <select id="selectTbAgriculturalMachineByName" parameterType="TbAgriculturalMachine" resultMap="TbAgriculturalMachineResult">
+        <include refid="selectTbAgriculturalMachineVo"/>
+        <where>
+            <if test="farmId != null  and farmId != ''  ">and farm_id = #{farmId},</if>
+            <if test="name != null  and name != '' "> and name LIKE CONCAT('%',#{name},'%')</if>
+        </where>
+    </select>
+        
+    <insert id="insertTbAgriculturalMachine" parameterType="TbAgriculturalMachine" useGeneratedKeys="true" keyProperty="machineId">
+        insert into tb_agricultural_machine
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="machineTypeId != null  ">machine_type_id,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="model != null  and model != ''  ">model,</if>
+			<if test="price != null  ">price,</if>
+			<if test="image != null  and image != ''  ">image,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="updateTime != null  ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="machineTypeId != null  ">#{machineTypeId},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="model != null  and model != ''  ">#{model},</if>
+			<if test="price != null  ">#{price},</if>
+			<if test="image != null  and image != ''  ">#{image},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbAgriculturalMachine" parameterType="TbAgriculturalMachine">
+        update tb_agricultural_machine
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="machineTypeId != null  ">machine_type_id = #{machineTypeId},</if>
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="model != null  and model != ''  ">model = #{model},</if>
+            <if test="price != null  ">price = #{price},</if>
+            <if test="image != null  and image != ''  ">image = #{image},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+        </trim>
+        where machine_id = #{machineId}
+    </update>
+
+	<delete id="deleteTbAgriculturalMachineById" parameterType="TbAgriculturalMachine">
+        delete from tb_agricultural_machine where machine_id = #{machineId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbAgriculturalMachineByIds" parameterType="String">
+        delete from tb_agricultural_machine where machine_id in 
+        <foreach item="machineId" collection="array" open="(" separator="," close=")">
+            #{machineId}
+        </foreach>
+    </delete>
+    
+</mapper>

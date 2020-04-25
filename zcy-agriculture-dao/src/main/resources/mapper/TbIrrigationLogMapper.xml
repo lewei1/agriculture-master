@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.irrigation.TbIrrigationLogMapper">
+    
+    <resultMap type="TbIrrigationLog" id="TbIrrigationLogResult">
+        <result property="actionLogId"    column="action_log_id"    />
+        <result property="actionType"    column="action_type"    />
+        <result property="actionContent"    column="action_content"    />
+        <result property="groupName"    column="group_name"    />
+        <result property="actionTime"    column="action_time"    />
+        <result property="actionBy"    column="action_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbIrrigationLogVo">
+        select action_log_id, action_type, action_content, group_name, action_time, action_by, farm_id from tb_irrigation_log
+    </sql>
+	
+    <select id="selectTbIrrigationLogList" parameterType="TbIrrigationLog" resultMap="TbIrrigationLogResult">
+        <include refid="selectTbIrrigationLogVo"/>
+        <where>  
+            <if test="actionLogId != null "> and action_log_id = #{actionLogId}</if>
+             <if test="actionType != null  and actionType != '' "> and action_type = #{actionType}</if>
+             <if test="actionContent != null  and actionContent != '' "> and action_content = #{actionContent}</if>
+             <if test="groupName != null  and groupName != '' "> and group_name = #{groupName}</if>
+             <if test="actionTime != null "> and action_time = #{actionTime}</if>
+             <if test="actionBy != null "> and action_by = #{actionBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+         order by action_time desc
+    </select>
+
+    <select id="selectTbIrrigationLogList2" parameterType="IrrigationLogParam" resultMap="TbIrrigationLogResult">
+        <include refid="selectTbIrrigationLogVo"/>
+        <where>
+            <if test="actionLogId != null "> and action_log_id = #{actionLogId}</if>
+            <if test="actionType != null  and actionType != '' "> and action_type = #{actionType}</if>
+            <if test="actionContent != null  and actionContent != '' "> and action_content = #{actionContent}</if>
+            <if test="groupName != null  and groupName != '' "> and group_name = #{groupName}</if>
+            <if test="actionTime != null "> and action_time = #{actionTime}</if>
+            <if test="actionBy != null "> and action_by = #{actionBy}</if>
+            <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+           <if test="startDate != null "> and action_time <![CDATA[ >= ]]> #{startDate}</if>
+          <if test="endDate != null "> and action_time <![CDATA[ <= ]]> #{endDate}</if>
+        </where>
+        order by action_time desc
+    </select>
+
+    <select id="selectTbIrrigationLogById" parameterType="Long" resultMap="TbIrrigationLogResult">
+        <include refid="selectTbIrrigationLogVo"/>
+        where action_log_id = #{actionLogId}
+    </select>
+        
+    <insert id="insertTbIrrigationLog" parameterType="TbIrrigationLog" useGeneratedKeys="true" keyProperty="actionLogId">
+        insert into tb_irrigation_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="actionType != null  and actionType != ''  ">action_type,</if>
+			<if test="actionContent != null  and actionContent != ''  ">action_content,</if>
+			<if test="groupName != null  and groupName != ''  ">group_name,</if>
+			<if test="actionTime != null  ">action_time,</if>
+			<if test="actionBy != null  ">action_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="actionType != null  and actionType != ''  ">#{actionType},</if>
+			<if test="actionContent != null  and actionContent != ''  ">#{actionContent},</if>
+			<if test="groupName != null  and groupName != ''  ">#{groupName},</if>
+			<if test="actionTime != null  ">#{actionTime},</if>
+			<if test="actionBy != null  ">#{actionBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbIrrigationLog" parameterType="TbIrrigationLog">
+        update tb_irrigation_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actionType != null  and actionType != ''  ">action_type = #{actionType},</if>
+            <if test="actionContent != null  and actionContent != ''  ">action_content = #{actionContent},</if>
+            <if test="groupName != null  and groupName != ''  ">group_name = #{groupName},</if>
+            <if test="actionTime != null  ">action_time = #{actionTime},</if>
+            <if test="actionBy != null  ">action_by = #{actionBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where action_log_id = #{actionLogId}
+    </update>
+
+	<delete id="deleteTbIrrigationLogById" parameterType="Long">
+        delete from tb_irrigation_log where action_log_id = #{actionLogId}
+    </delete>
+	
+    <delete id="deleteTbIrrigationLogByIds" parameterType="String">
+        delete from tb_irrigation_log where action_log_id in 
+        <foreach item="actionLogId" collection="array" open="(" separator="," close=")">
+            #{actionLogId}
+        </foreach>
+    </delete>
+<!--     根据农场ID查询 设备操作记录 -->
+    <select id="selectByFarmIdList" parameterType="String" resultType="HashMap">
+        SELECT
+			t.action_content AS actionContent,
+			DATE_FORMAT(t.action_time,'%Y-%m-%d') AS actionTime,
+			t1.nick_name AS nickName,
+			t1.head_url AS headUrl
+		FROM
+			tb_irrigation_log t
+		INNER JOIN vb_user t1 ON t.action_by = t1.user_code AND t.farm_id=#{farmId} AND t1.farm_id=#{farmId}
+		ORDER BY t.action_log_id DESC
+		LIMIT 5
+    </select>
+    <!--     根据农场ID查询  统计操作次数 -->
+    <select id="selectByFarmIdCou" parameterType="String" resultType="Integer">
+        SELECT
+			COUNT(1)
+		FROM
+			tb_irrigation_log t
+		WHERE t.farm_id=#{farmId} 
+		AND t.action_time >= STR_TO_DATE(#{createTimeStr},'%Y-%m-%d')
+    </select>
+</mapper>

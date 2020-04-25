@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.plot.TbPlotMapper">
+    
+    <resultMap type="TbPlot" id="TbPlotResult">
+        <result property="plotId"    column="plot_id"    />
+        <result property="plotImg"    column="plot_img"    />
+        <result property="plotName"    column="plot_name"    />
+        <result property="regionId"    column="region_id"    />
+        <result property="plotAcreage"    column="plot_acreage"    />
+        <result property="plotType"    column="plot_type"    />
+        <result property="plotStatus"    column="plot_status"    />
+        <result property="plotSequence"    column="plot_sequence"    />
+        <result property="plotColor"    column="plot_color"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+
+    <resultMap type="org.zcy.agriculture.vo.TbPlotVo" id="TbPlotResultBySubPlot">
+        <result property="plotId"    column="plot_id"    />
+        <result property="plotImg"    column="plot_img"    />
+        <result property="plotName"    column="plot_name"    />
+        <result property="regionId"    column="region_id"    />
+        <result property="plotAcreage"    column="plot_acreage"    />
+        <result property="plotType"    column="plot_type"    />
+        <result property="plotStatus"    column="plot_status"    />
+        <result property="plotSequence"    column="plot_sequence"    />
+        <collection  property="subPlot"  ofType="org.zcy.agriculture.vo.TbSubPlotVo">
+        	<result column="sub_plot_id"    property="subPlotId"    />
+        	<result column="sub_plot_name"    property="subPlotName"    />
+        	<result column="sub_plot_person"    property="subPlotPerson"    />
+        	<result column="sub_plot_acreage"    property="subPlotAcreage"    />
+        	<result column="userName"    property="userName"    />
+        	<result column="categoryName"    property="categoryName"    />
+        	<result column="plantTime"    property="plantTime"    />
+        	<result column="endTime"    property="endTime"    />
+        	<result column="headUrl"    property="headUrl"    />
+        </collection >
+    </resultMap>
+
+    <resultMap type="org.zcy.agriculture.vo.MonitorCenterPlotVo" id="MonitorCenterPlotVo">
+        <result property="plotId"    column="plot_id"    />
+        <result property="plotImg"    column="plot_img"    />
+        <result property="plotName"    column="plot_name"    />
+        <result property="plotAcreage"    column="plot_acreage"    />
+        <result property="plotColor"    column="plot_color"    />
+        <result property="plotType"    column="plot_type"    />
+    </resultMap>
+
+<!--     此方式要根据农场查询所有的地块，并且吧子地块也一并查询 -->
+    <select id="selectTbPlotResultBySubPlot"  parameterType="java.lang.String" resultMap="TbPlotResultBySubPlot">
+        SELECT
+			t.plot_id,
+			t.plot_img,
+			t.plot_name,
+			t.region_id,
+			t.plot_acreage,
+			t.plot_type,
+			t.plot_status,
+			t.plot_sequence,
+			t1.sub_plot_id,
+			t1.sub_plot_name,
+			t1.sub_plot_person,
+			t1.sub_plot_acreage,
+			u.nick_name AS userName,
+			<choose>
+		    	<when test="plantingStatus != null">(SELECT c.category_name FROM tb_crop_category c WHERE c.crop_category_id=p1.crop_category_id ) AS categoryName,p1.plant_time AS plantTime,p1.end_time AS endTime,</when>
+		    	<otherwise>'' AS categoryName,NULL AS plantTime,NULL AS endTime,</otherwise>
+		    </choose>
+			u.head_url AS headUrl
+		FROM
+			tb_plot t
+		INNER JOIN tb_sub_plot t1 ON t.plot_id = t1.plot_id
+		LEFT JOIN vb_user u ON u.user_code=t1.sub_plot_person AND u.farm_id=#{farmId}
+		<if test="plantingStatus != null"> INNER JOIN tb_planting p1 ON t1.sub_plot_id=p1.sub_plot_id AND p1.planting_status= #{plantingStatus}</if>
+		WHERE 
+			t1.sub_plot_status = 0
+		AND t.plot_status = 0
+		AND t.farm_id = #{farmId}
+    </select>
+	
+	<sql id="selectTbPlotVo">
+        select plot_id, plot_img, plot_name, region_id, plot_acreage, plot_type, plot_status, plot_sequence,plot_color, create_time, create_by, update_time, update_by, farm_id from tb_plot
+    </sql>
+	
+    <select id="selectTbPlotList" parameterType="TbPlot" resultMap="TbPlotResult">
+        <include refid="selectTbPlotVo"/>
+        <where>  
+            <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="plotImg != null  and plotImg != '' "> and plot_img = #{plotImg}</if>
+             <if test="plotName != null  and plotName != '' "> and plot_name = #{plotName}</if>
+             <if test="regionId != null "> and region_id = #{regionId}</if>
+             <if test="plotAcreage != null "> and plot_acreage = #{plotAcreage}</if>
+             <if test="plotType != null  and plotType != '' "> and plot_type = #{plotType}</if>
+             <if test="plotStatus != null "> and plot_status = #{plotStatus}</if>
+             <if test="plotSequence != null "> and plot_sequence = #{plotSequence}</if>
+             <if test="plotColor != null  and plotColor != '' "> and plot_color = #{plotColor}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+
+    <select id="selectSidebarPlotList" resultType="PlotSidebarVo">
+        SELECT
+            plot_id plotId,
+            plot_name plotName
+        FROM
+            tb_plot
+        WHERE
+            plot_status = 0
+        AND
+            region_id = #{regionId}
+        and
+            farm_id = #{farmId}
+    </select>
+
+    <select id="selectTbPlotStatics" parameterType="String" resultType="PlotStaticsVo">
+        SELECT
+            COUNT(plot_id) plotQuantity,
+            IFNULL(SUM(plot_acreage),0) muQuantity
+        FROM
+            tb_plot
+        WHERE
+            plot_status = 0
+        AND
+            farm_id = #{farmId}
+    </select>
+
+    <select id="selectMonitoringCenterPlotList" parameterType="String" resultType="MonitorCenterPlotVo">
+        SELECT
+            region_id regionId,
+            plot_id plotId,
+            plot_name plotName,
+            plot_acreage plotAcreage,
+            plot_color plotColor,
+            plot_type plotType
+        FROM
+            tb_plot
+        WHERE
+            plot_status = 0
+        AND
+            farm_id = #{farmId}
+    </select>
+
+
+    <select id="selectTbPlotById" parameterType="Long" resultMap="TbPlotResult">
+        <include refid="selectTbPlotVo"/>
+        where plot_id = #{plotId}
+    </select>
+
+
+        
+    <insert id="insertTbPlot" parameterType="TbPlot" useGeneratedKeys="true" keyProperty="plotId">
+        insert into tb_plot
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="plotImg != null  and plotImg != ''  ">plot_img,</if>
+			<if test="plotName != null  and plotName != ''  ">plot_name,</if>
+			<if test="regionId != null  ">region_id,</if>
+			<if test="plotAcreage != null  ">plot_acreage,</if>
+			<if test="plotType != null  and plotType != ''  ">plot_type,</if>
+			<if test="plotStatus != null  ">plot_status,</if>
+			<if test="plotSequence != null  ">plot_sequence,</if>
+			<if test="plotColor != null  and plotColor != ''  ">plot_color,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="plotImg != null  and plotImg != ''  ">#{plotImg},</if>
+			<if test="plotName != null  and plotName != ''  ">#{plotName},</if>
+			<if test="regionId != null  ">#{regionId},</if>
+			<if test="plotAcreage != null  ">#{plotAcreage},</if>
+			<if test="plotType != null  and plotType != ''  ">#{plotType},</if>
+			<if test="plotStatus != null  ">#{plotStatus},</if>
+			<if test="plotSequence != null  ">#{plotSequence},</if>
+			<if test="plotColor != null  and plotColor != ''  ">#{plotColor},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+
+
+
+    <update id="updateTbPlot" parameterType="TbPlot">
+        update tb_plot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plotImg != null  and plotImg != ''  ">plot_img = #{plotImg},</if>
+            <if test="plotName != null  and plotName != ''  ">plot_name = #{plotName},</if>
+            <if test="regionId != null  ">region_id = #{regionId},</if>
+            <if test="plotAcreage != null  ">plot_acreage = #{plotAcreage},</if>
+            <if test="plotType != null  and plotType != ''  ">plot_type = #{plotType},</if>
+            <if test="plotStatus != null  ">plot_status = #{plotStatus},</if>
+            <if test="plotSequence != null  ">plot_sequence = #{plotSequence},</if>
+            <if test="plotColor != null  and plotColor != ''  ">plot_color = #{plotColor},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where plot_id = #{plotId}
+    </update>
+
+	<delete id="deleteTbPlotById" parameterType="Long">
+        delete from tb_plot where plot_id = #{plotId}
+    </delete>
+	
+    <delete id="deleteTbPlotByIds" parameterType="String">
+        delete from tb_plot where plot_id in 
+        <foreach item="plotId" collection="array" open="(" separator="," close=")">
+            #{plotId}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

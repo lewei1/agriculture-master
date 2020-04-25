@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbFarmingTypeMapper">
+    
+    <resultMap type="TbFarmingType" id="TbFarmingTypeResult">
+        <result property="farmingTypeId"    column="farming_type_id"    />
+        <result property="farmingTypeName"    column="farming_type_name"    />
+        <result property="farmingTypeStatus"    column="farming_type_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="tpyeRecord"    column="tpye_record"    />
+        
+    </resultMap>
+	
+	<sql id="selectTbFarmingTypeVo">
+        select farming_type_id, farming_type_name, farming_type_status, create_time, create_by, update_time, update_by, farm_id,tpye_record from tb_farming_type
+    </sql>
+	
+    <select id="selectTbFarmingTypeList" parameterType="TbFarmingType" resultMap="TbFarmingTypeResult">
+        <include refid="selectTbFarmingTypeVo"/>
+        <where>  
+            <if test="farmingTypeId != null "> and farming_type_id = #{farmingTypeId}</if>
+             <if test="farmingTypeName != null  and farmingTypeName != '' "> and farming_type_name = #{farmingTypeName}</if>
+             <if test="farmingTypeStatus != null "> and farming_type_status = #{farmingTypeStatus}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> AND (farm_id IS NULL OR farm_id = #{farmId})</if>
+             <if test="tpyeRecord != null "> and tpye_record = #{tpyeRecord}</if>
+             
+         </where>
+    </select>
+    
+    <select id="selectTbFarmingTypeById" parameterType="Long" resultMap="TbFarmingTypeResult">
+        <include refid="selectTbFarmingTypeVo"/>
+        where farming_type_id = #{farmingTypeId}
+    </select>
+        
+    <insert id="insertTbFarmingType" parameterType="TbFarmingType" useGeneratedKeys="true" keyProperty="farmingTypeId">
+        insert into tb_farming_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmingTypeName != null  and farmingTypeName != ''  ">farming_type_name,</if>
+			<if test="farmingTypeStatus != null  ">farming_type_status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="tpyeRecord != null  ">tpye_record,</if>
+			
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmingTypeName != null  and farmingTypeName != ''  ">#{farmingTypeName},</if>
+			<if test="farmingTypeStatus != null  ">#{farmingTypeStatus},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="tpyeRecord != null  ">#{tpyeRecord},</if>
+			
+         </trim>
+    </insert>
+	 
+    <update id="updateTbFarmingType" parameterType="TbFarmingType">
+        update tb_farming_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmingTypeName != null  and farmingTypeName != ''  ">farming_type_name = #{farmingTypeName},</if>
+            <if test="farmingTypeStatus != null  ">farming_type_status = #{farmingTypeStatus},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="tpyeRecord != null  ">tpye_record = #{tpyeRecord},</if>
+        </trim>
+        where farming_type_id = #{farmingTypeId}
+    </update>
+
+	<delete id="deleteTbFarmingTypeById" parameterType="Long">
+        delete from tb_farming_type where farming_type_id = #{farmingTypeId}
+    </delete>
+	
+    <delete id="deleteTbFarmingTypeByIds" parameterType="String">
+        delete from tb_farming_type where farming_type_id in 
+        <foreach item="farmingTypeId" collection="array" open="(" separator="," close=")">
+            #{farmingTypeId}
+        </foreach>
+    </delete>
+    
+</mapper>

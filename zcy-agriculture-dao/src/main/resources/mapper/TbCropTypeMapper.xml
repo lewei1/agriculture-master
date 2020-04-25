@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbCropTypeMapper">
+    
+    <resultMap type="TbCropType" id="TbCropTypeResult">
+        <result property="cropTypeId"    column="crop_type_id"    />
+        <result property="cropName"    column="crop_name"    />
+        <result property="cropStatus"    column="crop_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="cropCategoryId"    column="crop_category_id"    />
+    </resultMap>
+	
+	<sql id="selectTbCropTypeVo">
+        select crop_type_id, crop_name, crop_status, create_time, create_by, update_time, update_by, farm_id, crop_category_id from tb_crop_type
+    </sql>
+	
+    <select id="selectTbCropTypeList" parameterType="TbCropType" resultMap="TbCropTypeResult">
+        <include refid="selectTbCropTypeVo"/>
+        <where>  
+            <if test="cropTypeId != null "> and crop_type_id = #{cropTypeId}</if>
+             <if test="cropName != null  and cropName != '' "> and crop_name = #{cropName}</if>
+             <if test="cropStatus != null "> and crop_status = #{cropStatus}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and (farm_id = #{farmId} or farm_id is null)</if>
+             <if test="cropCategoryId != null "> and crop_category_id = #{cropCategoryId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbCropTypeById" parameterType="Long" resultMap="TbCropTypeResult">
+        <include refid="selectTbCropTypeVo"/>
+        where crop_type_id = #{cropTypeId}
+    </select>
+        
+    <insert id="insertTbCropType" parameterType="TbCropType" useGeneratedKeys="true" keyProperty="cropTypeId">
+        insert into tb_crop_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="cropName != null  and cropName != ''  ">crop_name,</if>
+			<if test="cropStatus != null  ">crop_status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="cropCategoryId != null  ">crop_category_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="cropName != null  and cropName != ''  ">#{cropName},</if>
+			<if test="cropStatus != null  ">#{cropStatus},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="cropCategoryId != null  ">#{cropCategoryId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbCropType" parameterType="TbCropType">
+        update tb_crop_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cropName != null  and cropName != ''  ">crop_name = #{cropName},</if>
+            <if test="cropStatus != null  ">crop_status = #{cropStatus},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="cropCategoryId != null  ">crop_category_id = #{cropCategoryId},</if>
+        </trim>
+        where crop_type_id = #{cropTypeId}
+    </update>
+
+	<delete id="deleteTbCropTypeById" parameterType="Long">
+        delete from tb_crop_type where crop_type_id = #{cropTypeId}
+    </delete>
+	
+    <delete id="deleteTbCropTypeByIds" parameterType="String">
+        delete from tb_crop_type where crop_type_id in 
+        <foreach item="cropTypeId" collection="array" open="(" separator="," close=")">
+            #{cropTypeId}
+        </foreach>
+    </delete>
+     <!--     根据农场判断名称是否重复 -->
+    <select id="selectByCropNameRepeat" resultType="Integer">
+        SELECT
+			count(0) AS cou
+		FROM
+			tb_crop_type t
+		WHERE
+			t.farm_id=#{farmId}
+		AND t.crop_name =#{cropName}
+		AND t.crop_category_id = #{cropCategoryId}
+		<if test="cropTypeId != null  "> AND t.crop_type_id != #{cropTypeId} </if>
+		
+    </select>
+</mapper>

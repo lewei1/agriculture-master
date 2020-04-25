@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbUnitTypeMapper">
+    
+    <resultMap type="TbUnitType" id="TbUnitTypeResult">
+        <result property="materialUnitId"    column="material_unit_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="materialId"    column="material_id"    />
+    </resultMap>
+	
+	<sql id="selectTbUnitTypeVo">
+        select material_unit_id, farm_id, type_name, create_time, create_by, update_time, update_by from tb_unit_type
+    </sql>
+	
+    <select id="selectTbUnitTypeList" parameterType="TbUnitType" resultMap="TbUnitTypeResult">
+        <include refid="selectTbUnitTypeVo"/>
+        <where>  
+            <if test="materialUnitId != null "> and material_unit_id = #{materialUnitId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="typeName != null  and typeName != '' "> and type_name = #{typeName}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+         </where>
+    </select>
+
+    <select id="selectTbUnitTypeListByMaterialId" parameterType="TbUnitType" resultMap="TbUnitTypeResult">
+        SELECT
+        tut.material_unit_id,
+        tut.farm_id,
+        tut.type_name,
+        tut.create_time,
+        tut.create_by,
+        tut.update_time,
+        tut.update_by
+        FROM
+        tb_unit_type tut
+        LEFT JOIN tb_article ta ON (
+        tut.material_unit_id = ta.meter_unit_id
+        OR tut.material_unit_id = ta.unit_id1
+        OR tut.material_unit_id = ta.unit_id2
+        )
+        WHERE
+        ta.material_id = #{materialId} and tut.farm_id = #{farmId}
+    </select>
+    
+    <select id="selectTbUnitTypeById" parameterType="TbUnitType" resultMap="TbUnitTypeResult">
+        <include refid="selectTbUnitTypeVo"/>
+        where material_unit_id = #{materialUnitId} and farm_id = #{farmId}
+    </select>
+        
+    <insert id="insertTbUnitType" parameterType="TbUnitType" useGeneratedKeys="true" keyProperty="materialUnitId">
+        insert into tb_unit_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="typeName != null  and typeName != ''  ">type_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="typeName != null  and typeName != ''  ">#{typeName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbUnitType" parameterType="TbUnitType">
+        update tb_unit_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="typeName != null  and typeName != ''  ">type_name = #{typeName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+        </trim>
+        where material_unit_id = #{materialUnitId}
+    </update>
+
+	<delete id="deleteTbUnitTypeById" parameterType="TbUnitType">
+        delete from tb_unit_type where material_unit_id = #{materialUnitId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbUnitTypeByIds" parameterType="String">
+        delete from tb_unit_type where material_unit_id in 
+        <foreach item="materialUnitId" collection="array" open="(" separator="," close=")">
+            #{materialUnitId}
+        </foreach>
+    </delete>
+    
+</mapper>

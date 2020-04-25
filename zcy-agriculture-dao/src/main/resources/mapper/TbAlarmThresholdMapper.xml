@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbAlarmThresholdMapper">
+    
+    <resultMap type="TbAlarmThreshold" id="TbAlarmThresholdResult">
+        <result property="alarmThresholdId"    column="alarm_threshold_id"    />
+        <result property="typesIndex"    column="types_index"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="dayMinValue"    column="day_min_value"    />
+        <result property="dayMaxValue"    column="day_max_value"    />
+        <result property="nightMinValue"    column="night_min_value"    />
+        <result property="nightMaxValue"    column="night_max_value"    />
+    </resultMap>
+	
+	<sql id="selectTbAlarmThresholdVo">
+        select alarm_threshold_id, types_index, farm_id, plot_id, day_min_value, day_max_value, night_min_value, night_max_value from tb_alarm_threshold
+    </sql>
+	
+    <select id="selectTbAlarmThresholdList" parameterType="TbAlarmThreshold" resultMap="TbAlarmThresholdResult">
+        <include refid="selectTbAlarmThresholdVo"/>
+        <where>  
+            <if test="alarmThresholdId != null "> and alarm_threshold_id = #{alarmThresholdId}</if>
+             <if test="typesIndex != null "> and types_index = #{typesIndex}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="dayMinValue != null "> and day_min_value = #{dayMinValue}</if>
+             <if test="dayMaxValue != null "> and day_max_value = #{dayMaxValue}</if>
+             <if test="nightMinValue != null "> and night_min_value = #{nightMinValue}</if>
+             <if test="nightMaxValue != null "> and night_max_value = #{nightMaxValue}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbAlarmThresholdById" parameterType="Long" resultMap="TbAlarmThresholdResult">
+        <include refid="selectTbAlarmThresholdVo"/>
+        where alarm_threshold_id = #{alarmThresholdId}
+    </select>
+        
+    <insert id="insertTbAlarmThreshold" parameterType="TbAlarmThreshold" useGeneratedKeys="true" keyProperty="alarmThresholdId">
+        insert into tb_alarm_threshold
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="typesIndex != null  ">types_index,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="dayMinValue != null  ">day_min_value,</if>
+			<if test="dayMaxValue != null  ">day_max_value,</if>
+			<if test="nightMinValue != null  ">night_min_value,</if>
+			<if test="nightMaxValue != null  ">night_max_value,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="typesIndex != null  ">#{typesIndex},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="dayMinValue != null  ">#{dayMinValue},</if>
+			<if test="dayMaxValue != null  ">#{dayMaxValue},</if>
+			<if test="nightMinValue != null  ">#{nightMinValue},</if>
+			<if test="nightMaxValue != null  ">#{nightMaxValue},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbAlarmThreshold" parameterType="TbAlarmThreshold">
+        update tb_alarm_threshold
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typesIndex != null  ">types_index = #{typesIndex},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="dayMinValue != null  ">day_min_value = #{dayMinValue},</if>
+            <if test="dayMaxValue != null  ">day_max_value = #{dayMaxValue},</if>
+            <if test="nightMinValue != null  ">night_min_value = #{nightMinValue},</if>
+            <if test="nightMaxValue != null  ">night_max_value = #{nightMaxValue},</if>
+        </trim>
+        <where>
+            <if test="typesIndex != null "> and types_index = #{typesIndex}</if>
+            <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+            <if test="plotId != null "> and plot_id = #{plotId}</if>
+        </where>
+    </update>
+
+	<delete id="deleteTbAlarmThresholdById" parameterType="Long">
+        delete from tb_alarm_threshold where alarm_threshold_id = #{alarmThresholdId}
+    </delete>
+	
+    <delete id="deleteTbAlarmThresholdByIds" parameterType="String">
+        delete from tb_alarm_threshold where alarm_threshold_id in 
+        <foreach item="alarmThresholdId" collection="array" open="(" separator="," close=")">
+            #{alarmThresholdId}
+        </foreach>
+    </delete>
+
+
+    <select id="getCountFromTbAlarmThreshold" parameterType="TbAlarmThreshold" resultType="Long">
+        select count(*) num from tb_alarm_threshold
+        <where>
+            <if test="alarmThresholdId != null "> and alarm_threshold_id = #{alarmThresholdId}</if>
+            <if test="typesIndex != null "> and types_index = #{typesIndex}</if>
+            <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+            <if test="plotId != null "> and plot_id = #{plotId}</if>
+            <if test="dayMinValue != null "> and day_min_value = #{dayMinValue}</if>
+            <if test="dayMaxValue != null "> and day_max_value = #{dayMaxValue}</if>
+            <if test="nightMinValue != null "> and night_min_value = #{nightMinValue}</if>
+            <if test="nightMaxValue != null "> and night_max_value = #{nightMaxValue}</if>
+        </where>
+    </select>
+
+</mapper>

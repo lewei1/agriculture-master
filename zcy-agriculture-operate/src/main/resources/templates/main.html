@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body class="gray-bg">
+    <div class="container-div">
+    	
+		<div class="row">
+		
+			<div class="col-sm-12" style = "padding-left: 0px;">
+				所有订单:
+			</div>
+			<div>
+				<div class="col-sm-3 search-collapse" style = "width:20%;float:left;background:#ed5565">
+					<div style="text-align:center;padding:15px 0;color:#fff;">
+						<div style="font-weight:blod;font-size:24px;" ><span th:text="${noPayNum}"></span></div>
+						<div>待支付订单</div>
+					</div>
+				</div>
+				<div class="col-sm-3 search-collapse" style = "width:20%;float:left;margin-left:20px;background:#f8ac59">
+					<div style="text-align:center;padding:15px 0;color:#fff;">
+						<div style="font-weight:blod;font-size:24px;"><span th:text="${payNum}"></span></div>
+						<div>已支付订单</div>
+					</div>
+				</div>
+				<div class="col-sm-3 search-collapse" style = "width:20%;float:left;margin-left:20px;background:#1ab394">
+					<div style="padding-top:20px;color:#fff;">
+						<div style = "font-size:12px;">总金额:</div>
+						<div style = "padding:5px 0;font-weight:blod;font-size:24px;"><span th:text="${price}"></span> 元</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-12" style = "padding-top: 16px;padding-left: 0px;">
+				平台订单类型:
+			</div>
+			
+	        <div class="col-sm-12 search-collapse" style = "">
+			    <div style = "width:15%;float:left;padding:15px 0px 0px 0px;" th:each="item:${pList}">
+			    	<div th:text="${item.packageName}"></div>
+			    	<div style = "font-weight:blod;font-size:28px;padding-top:8px;">
+			    		<span th:text="${item.scanRequestNum}"></span>
+			    	</div>
+			    </div>
+			</div>
+		</div>
+	</div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>

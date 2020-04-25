@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbPlanPlotMapper">
+    
+    <resultMap type="TbPlanPlot" id="TbPlanPlotResult">
+        <result property="planPlotId"    column="plan_plot_id"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="subPlotId"    column="sub_plot_id"    />
+        <result property="planId"    column="plan_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlanPlotVo">
+        select plan_plot_id, plot_id, sub_plot_id, plan_id from tb_plan_plot
+    </sql>
+	
+    <select id="selectTbPlanPlotList" parameterType="TbPlanPlot" resultMap="TbPlanPlotResult">
+        <include refid="selectTbPlanPlotVo"/>
+        <where>  
+            <if test="planPlotId != null "> and plan_plot_id = #{planPlotId}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="subPlotId != null "> and sub_plot_id = #{subPlotId}</if>
+             <if test="planId != null "> and plan_id = #{planId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlanPlotById" parameterType="Long" resultMap="TbPlanPlotResult">
+        <include refid="selectTbPlanPlotVo"/>
+        where plan_plot_id = #{planPlotId}
+    </select>
+        
+    <insert id="insertTbPlanPlot" parameterType="TbPlanPlot" useGeneratedKeys="true" keyProperty="planPlotId">
+        insert into tb_plan_plot
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="subPlotId != null  ">sub_plot_id,</if>
+			<if test="planId != null  ">plan_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="subPlotId != null  ">#{subPlotId},</if>
+			<if test="planId != null  ">#{planId},</if>
+         </trim>
+    </insert>
+    
+    <insert id="insertBatchTbPlanPlot" parameterType="TbPlanPlot" >
+        insert into tb_plan_plot
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			plot_id,
+			sub_plot_id,
+			plan_id,
+         </trim>
+         values 
+          <foreach collection="list" item="team" separator=",">
+	        <trim prefix=" (" suffix=")" suffixOverrides=",">
+				#{team.plotId},
+				#{team.subPlotId},
+				#{team.planId},
+	         </trim>
+         </foreach>
+    </insert>
+    
+    <insert id="copyPlanPloat" parameterType="TbPlanPlot" >
+        insert into tb_plan_plot
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			plot_id,
+			sub_plot_id,
+			plan_id,
+         </trim>
+         select plot_id , sub_plot_id , #{newPlanId} from 
+         tb_plan_plot where plan_id = #{planId} 
+         <if test="subPlotId != null "> and sub_plot_id = #{subPlotId}</if>
+    </insert>
+	 
+    <update id="updateTbPlanPlot" parameterType="TbPlanPlot">
+        update tb_plan_plot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="subPlotId != null  ">sub_plot_id = #{subPlotId},</if>
+            <if test="planId != null  ">plan_id = #{planId},</if>
+        </trim>
+        where plan_plot_id = #{planPlotId}
+    </update>
+
+	<delete id="deleteTbPlanPlotById" parameterType="Long">
+        delete from tb_plan_plot where plan_plot_id = #{planPlotId}
+    </delete>
+	
+    <delete id="deleteTbPlanPlotByIds" parameterType="String">
+        delete from tb_plan_plot where plan_plot_id in 
+        <foreach item="planPlotId" collection="array" open="(" separator="," close=")">
+            #{planPlotId}
+        </foreach>
+    </delete>
+<!--     根据农事计划ID查询 地块ID -->
+    <select id="selectByPlanIdGetPlotId" parameterType="Long" resultType="HashMap">
+        SELECT DISTINCT
+			t1.plot_id AS plotId,
+			t1.sub_plot_id AS subPlotId
+		FROM
+			tb_plan_plot t
+		INNER JOIN tb_sub_plot t1 ON t.sub_plot_id = t1.sub_plot_id AND t.plan_id=#{planId}
+    </select>
+</mapper>

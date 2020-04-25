@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.model.TbModelPeriodFarmingMapper">
+    
+    <resultMap type="TbModelPeriodFarming" id="TbModelPeriodFarmingResult">
+        <result property="farmingId"    column="farming_id"    />
+        <result property="plantType"    column="plant_type"    />
+        <result property="plantDay"    column="plant_day"    />
+        <result property="farmingTypeId"    column="farming_type_id"    />
+        <result property="farmingRequirements"    column="farming_requirements"    />
+        <result property="periodId"    column="period_id"    />
+    </resultMap>
+	
+	<sql id="selectTbModelPeriodFarmingVo">
+        select farming_id, plant_type, plant_day, farming_type_id, farming_requirements, period_id from tb_model_period_farming
+    </sql>
+	
+    <select id="selectTbModelPeriodFarmingList" parameterType="TbModelPeriodFarming" resultMap="TbModelPeriodFarmingResult">
+        <include refid="selectTbModelPeriodFarmingVo"/>
+        <where>  
+            <if test="farmingId != null "> and farming_id = #{farmingId}</if>
+             <if test="plantType != null  and plantType != '' "> and plant_type = #{plantType}</if>
+             <if test="plantDay != null "> and plant_day = #{plantDay}</if>
+             <if test="farmingTypeId != null "> and farming_type_id = #{farmingTypeId}</if>
+             <if test="farmingRequirements != null  and farmingRequirements != '' "> and farming_requirements = #{farmingRequirements}</if>
+             <if test="periodId != null "> and period_id = #{periodId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbModelPeriodFarmingListByIds" resultMap="TbModelPeriodFarmingResult">
+        <include refid="selectTbModelPeriodFarmingVo"/>
+        <where>  
+            <if test="list != null ">
+            	 and farming_id in (
+            	 <foreach collection ="list" item="item" index= "index" separator =",">
+		            #{item} 
+		        </foreach > ) 
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectTbModelPeriodFarmingById" parameterType="Long" resultMap="TbModelPeriodFarmingResult">
+        <include refid="selectTbModelPeriodFarmingVo"/>
+        where farming_id = #{farmingId}
+    </select>
+        
+    <insert id="insertTbModelPeriodFarming" parameterType="TbModelPeriodFarming" useGeneratedKeys="true" keyProperty="farmingId">
+        insert into tb_model_period_farming
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="plantType != null  and plantType != ''  ">plant_type,</if>
+			<if test="plantDay != null  ">plant_day,</if>
+			<if test="farmingTypeId != null  ">farming_type_id,</if>
+			<if test="farmingRequirements != null  and farmingRequirements != ''  ">farming_requirements,</if>
+			<if test="periodId != null  ">period_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="plantType != null  and plantType != ''  ">#{plantType},</if>
+			<if test="plantDay != null  ">#{plantDay},</if>
+			<if test="farmingTypeId != null  ">#{farmingTypeId},</if>
+			<if test="farmingRequirements != null  and farmingRequirements != ''  ">#{farmingRequirements},</if>
+			<if test="periodId != null  ">#{periodId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbModelPeriodFarming" parameterType="TbModelPeriodFarming">
+        update tb_model_period_farming
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plantType != null  and plantType != ''  ">plant_type = #{plantType},</if>
+            <if test="plantDay != null  ">plant_day = #{plantDay},</if>
+            <if test="farmingTypeId != null  ">farming_type_id = #{farmingTypeId},</if>
+            <if test="farmingRequirements != null  and farmingRequirements != ''  ">farming_requirements = #{farmingRequirements},</if>
+            <if test="periodId != null  ">period_id = #{periodId},</if>
+        </trim>
+        where farming_id = #{farmingId}
+    </update>
+
+	<delete id="deleteTbModelPeriodFarmingById" parameterType="Long">
+        delete from tb_model_period_farming where farming_id = #{farmingId}
+    </delete>
+	
+    <delete id="deleteTbModelPeriodFarmingByIds" parameterType="String">
+        delete from tb_model_period_farming where farming_id in 
+        <foreach item="farmingId" collection="array" open="(" separator="," close=")">
+            #{farmingId}
+        </foreach>
+    </delete>
+    
+</mapper>

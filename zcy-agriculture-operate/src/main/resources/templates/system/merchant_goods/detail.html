@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jsonview/jquery.jsonview.css}" rel="stylesheet"/>
+<style type="text/css" scoped>
+	#goods-form
+	.form-group
+	.fit {
+		margin-left: 20px;
+		padding-top: 10px;
+	}
+</style>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content" >
+		<form class="form-horizontal m-t" id="goods-form">
+		<div class="form-group">
+			<div style="font-weight: bold;font-size: large;" align="center">商品基础信息</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >商户账号：</label>
+			<div class="form-control-static" th:text="${infoVo.phoneNumber}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >企业名称：</label>
+			<div class="form-control-static" th:text="${infoVo.companyName}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >联系人：</label>
+			<div class="form-control-static" th:text="${infoVo.companyName}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >商品名称：</label>
+			<div class="form-control-static" th:text="${infoVo.goodsName}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >商品分类：</label>
+			<div class="form-control-static" th:text="${infoVo.categoryName}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >商品编号：</label>
+			<div class="form-control-static" th:text="${infoVo.goodsNo}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >添加时间：</label>
+			<div class="form-control-static" th:text="${#dates.format(infoVo.dateCreated, 'yyyy-MM-dd HH:mm:ss')}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 fit" >商品图片：</label>
+			<div class="form-control-static" id="imgArray">
+			</div>
+		</div>
+
+
+		<div class="form-group" style="margin-top: 50px">
+			<div style="font-weight: bold;font-size: large;" align="center">商品自定义信息</div>
+		</div>
+		<div class="form-group">
+			<div align="center">
+				<label class="col-sm-6 " style="font-weight: bold;font-size: medium;">名称</label>
+			</div>
+			<div align="center">
+				<label class="col-sm-6 " style="font-weight: bold;font-size: medium;">内容</label>
+			</div>
+		</div>
+		<div th:each="spec,specStat : ${infoVo.specsList}">
+			<div class="form-group" >
+				<div align="center"><label class="col-sm-6" th:text="${spec.specKey}" ></label></div>
+				<div align="center"><label class="col-sm-6" th:text="${spec.specValue}"></label></div>
+			</div>
+		</div>
+
+	</form>
+    </div>
+    <div th:include="include :: footer"></div>
+	<script th:inline="javascript">
+		var preUrl = imageUrlPre;
+
+		$(function () {
+			var imgList = [[${infoVo.imgList}]];
+			for(var i=0; i<imgList.length; i++) {
+				var src = preUrl + imgList[i].imgUrl;
+				var img = "<div style=\"float: left;width: 14%;height: 100px;overflow: hidden;margin-right: 10px\">" +
+						"<img src='"+src+"' alt='' style='width: 100%;height: 100%'></div>";
+				$('#imgArray').append(img);
+			}
+		});
+	</script>
+</body>
+</html>

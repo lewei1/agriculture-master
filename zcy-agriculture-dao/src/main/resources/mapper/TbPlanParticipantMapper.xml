@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbPlanParticipantMapper">
+    
+    <resultMap type="TbPlanParticipant" id="TbPlanParticipantResult">
+        <result property="planUserId"    column="plan_user_id"    />
+        <result property="responserId"    column="responser_id"    />
+        <result property="participantId"    column="participant_id"    />
+        <result property="planId"    column="plan_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlanParticipantVo">
+        select plan_user_id, responser_id, participant_id, plan_id from tb_plan_participant
+    </sql>
+	
+    <select id="selectTbPlanParticipantList" parameterType="TbPlanParticipant" resultMap="TbPlanParticipantResult">
+        <include refid="selectTbPlanParticipantVo"/>
+        <where>  
+            <if test="planUserId != null "> and plan_user_id = #{planUserId}</if>
+             <if test="responserId != null "> and responser_id = #{responserId}</if>
+             <if test="participantId != null "> and participant_id = #{participantId}</if>
+             <if test="planId != null "> and plan_id = #{planId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlanParticipantById" parameterType="Long" resultMap="TbPlanParticipantResult">
+        <include refid="selectTbPlanParticipantVo"/>
+        where plan_user_id = #{planUserId}
+    </select>
+        
+    <insert id="insertTbPlanParticipant" parameterType="TbPlanParticipant" useGeneratedKeys="true" keyProperty="planUserId">
+        insert into tb_plan_participant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="responserId != null  ">responser_id,</if>
+			<if test="participantId != null  ">participant_id,</if>
+			<if test="planId != null  ">plan_id,</if>
+			<if test="subPlotId != null  ">sub_plot_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="responserId != null  ">#{responserId},</if>
+			<if test="participantId != null  ">#{participantId},</if>
+			<if test="planId != null  ">#{planId},</if>
+			<if test="subPlotId != null  ">#{subPlotId},</if>
+         </trim>
+    </insert>
+    
+    <insert id="copyPlanParticipant" parameterType="TbPlanParticipant">
+        insert into tb_plan_participant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			responser_id,
+			participant_id,
+			plan_id,
+			sub_plot_id,
+        </trim>
+        select responser_id , participant_id , #{newPlanId} , sub_plot_id from tb_plan_participant 
+        where plan_id = #{planId}
+        <if test="subPlotId != null  "> and sub_plot_id = #{subPlotId}</if>
+    </insert>
+    
+    <insert id="insertBatchTbPlanParticipant" parameterType="TbPlanParticipant">
+        insert into tb_plan_participant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			responser_id,
+			participant_id,
+			plan_id,
+			sub_plot_id,
+        </trim>
+        values 
+        <foreach collection="list" item="team" separator=",">
+	        <trim prefix=" (" suffix=")" suffixOverrides=",">
+				#{team.responserId},
+				#{team.participantId},
+				#{team.planId},
+				#{team.subPlotId},
+	        </trim>
+        </foreach>
+    </insert>
+    
+    
+	 
+    <update id="updateTbPlanParticipant" parameterType="TbPlanParticipant">
+        update tb_plan_participant
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="responserId != null  ">responser_id = #{responserId},</if>
+            <if test="participantId != null  ">participant_id = #{participantId},</if>
+            <if test="planId != null  ">plan_id = #{planId},</if>
+        </trim>
+        where plan_user_id = #{planUserId}
+    </update>
+
+	<delete id="deleteTbPlanParticipantById" parameterType="Long">
+        delete from tb_plan_participant where plan_user_id = #{planUserId}
+    </delete>
+<!--     根据子地块和计划ID删除成员 -->
+    <delete id="deleteTbPlanParticipantBySubPlotId" parameterType="Long">
+        delete from tb_plan_participant where sub_plot_id = #{subPlotId} AND plan_id=#{planId}
+    </delete>
+	
+    <delete id="deleteTbPlanParticipantByIds" parameterType="String">
+        delete from tb_plan_participant where plan_user_id in 
+        <foreach item="planUserId" collection="array" open="(" separator="," close=")">
+            #{planUserId}
+        </foreach>
+    </delete>
+<!--     根据农事计划ID查询 负责人 和参与者 -->
+    <select id="selectByPlanParticipantList" resultType="HashMap">
+        SELECT
+			IF(t1.user_code IS NOT NULL, 1, IF(t2.user_code IS NOT NULL,2,null)) AS type,
+			t1.nick_name AS fNickName,
+			t1.head_url AS fHeadUrl,
+			t1.user_code AS fUserCode,
+			t2.nick_name AS cNickName,
+			t2.head_url AS cheadUrl,
+			t2.user_code AS cUserCode,
+			t.plan_user_id AS planUserId
+		FROM
+			tb_plan_participant t
+		LEFT JOIN vb_user t1 ON t.responser_id = t1.user_code AND t1.farm_id=#{farmId}
+		LEFT JOIN vb_user t2 ON t.participant_id = t2.user_code AND t2.farm_id=#{farmId}
+		WHERE t.plan_id=#{planId} AND (t1.user_code IS NOT NULL OR t2.user_code IS NOT NULL)
+		<if test="subPlotId != null  ">  AND t.sub_plot_id=#{subPlotId} </if>
+    </select>
+
+    <delete id="deleteByFarmIdAndUserCode" parameterType="map">
+        delete from tb_plan_participant
+        where
+         plan_id in (select plan_id from tb_farming_plan where farm_id = #{farmId})
+         and responser_id = #{userCode} or participant_id = #{userCode}
+    </delete>
+
+</mapper>

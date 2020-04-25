@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbPlanMessageMapper">
+    
+    <resultMap type="TbPlanMessage" id="TbPlanMessageResult">
+        <result property="messageId"    column="message_id"    />
+        <result property="messageContent"    column="message_content"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="planId"    column="plan_id"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="status"    column="status"    />
+        
+    </resultMap>
+	
+	<sql id="selectTbPlanMessageVo">
+        select message_id, message_content, create_time, create_by, plan_id,img_url,status from tb_plan_message
+    </sql>
+	
+    <select id="selectTbPlanMessageList" parameterType="TbPlanMessage" resultMap="TbPlanMessageResult">
+        <include refid="selectTbPlanMessageVo"/>
+        <where>  
+            <if test="messageId != null "> and message_id = #{messageId}</if>
+             <if test="messageContent != null  and messageContent != '' "> and message_content = #{messageContent}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="planId != null "> and plan_id = #{planId}</if>
+             <if test="status != null "> and status = #{status}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlanMessageById" parameterType="Long" resultMap="TbPlanMessageResult">
+        <include refid="selectTbPlanMessageVo"/>
+        where message_id = #{messageId}
+    </select>
+        
+    <insert id="insertTbPlanMessage" parameterType="TbPlanMessage" useGeneratedKeys="true" keyProperty="messageId">
+        insert into tb_plan_message
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="messageContent != null  and messageContent != ''  ">message_content,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="planId != null  ">plan_id,</if>
+			<if test="imgUrl != null  ">img_url,</if>
+			<if test="status != null  ">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="messageContent != null  and messageContent != ''  ">#{messageContent},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="planId != null  ">#{planId},</if>
+			<if test="imgUrl != null  ">#{imgUrl},</if>
+			<if test="status != null  ">#{status},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbPlanMessage" parameterType="TbPlanMessage">
+        update tb_plan_message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="messageContent != null  and messageContent != ''  ">message_content = #{messageContent},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="planId != null  ">plan_id = #{planId},</if>
+            <if test="imgUrl != null  ">img_url = #{imgUrl},</if>
+            <if test="status != null  ">status = #{status},</if>
+        </trim>
+        where message_id = #{messageId}
+    </update>
+
+	<delete id="deleteTbPlanMessageById" parameterType="Long">
+        delete from tb_plan_message where message_id = #{messageId}
+    </delete>
+	
+    <delete id="deleteTbPlanMessageByIds" parameterType="String">
+        delete from tb_plan_message where message_id in 
+        <foreach item="messageId" collection="array" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </delete>
+<!--     查询农事计划聊天记录 -->
+    <select id="selectByChatRecordList" resultType="org.zcy.agriculture.vo.TbPlanMessageVo">
+        SELECT
+			t.message_id AS messageId,
+			t.create_time AS createTime,
+			t.message_content AS messageContent,
+			t.img_url AS imgUrl,
+			t1.nick_name AS nickName,
+			t1.head_url AS headUrl
+		FROM
+			tb_plan_message t
+		LEFT JOIN vb_user t1 ON t.create_by = t1.user_code AND t1.farm_id=#{farmId}
+		WHERE t.plan_id=#{planId} AND t.status=0
+		ORDER BY
+			t.message_id DESC
+    </select>
+</mapper>

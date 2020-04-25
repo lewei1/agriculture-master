@@ -1,0 +1,30 @@
+#Multiple Access Schemes
+spring:
+  aop:
+    auto: true
+  profiles:
+    #选择启用的环境配置（dev test prod）
+    active: test
+    #热部署
+  devtools:
+    restart:
+      enabled: true  #设置开启热部署
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100000000
+      max-request-size: 100000000
+
+
+
+#contextpath & port
+server:
+  servlet:
+    context-path: /
+  tomcat:
+    max-http-post-size: 0
+  port: 8090
+
+logging:
+  config: classpath:log4j2.xml
+

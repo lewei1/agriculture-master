@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.plot.TbPlotReportMapper">
+    
+    <resultMap type="TbPlotReport" id="TbPlotReportResult">
+        <result property="reportId"    column="report_id"    />
+        <result property="reportName"    column="report_name"    />
+        <result property="reportCompany"    column="report_company"    />
+        <result property="reportTime"    column="report_time"    />
+        <result property="reportResult"    column="report_result"    />
+        <result property="plotId"    column="plot_id"    />
+    </resultMap>
+	
+	<sql id="selectTbPlotReportVo">
+        select report_id, report_name, report_company, report_time, report_result, plot_id from tb_plot_report
+    </sql>
+	
+    <select id="selectTbPlotReportList" parameterType="TbPlotReport" resultMap="TbPlotReportResult">
+        <include refid="selectTbPlotReportVo"/>
+        <where>  
+            <if test="reportId != null "> and report_id = #{reportId}</if>
+             <if test="reportName != null  and reportName != '' "> and report_name = #{reportName}</if>
+             <if test="reportCompany != null  and reportCompany != '' "> and report_company = #{reportCompany}</if>
+             <if test="reportTime != null "> and report_time = #{reportTime}</if>
+             <if test="reportResult != null  and reportResult != '' "> and report_result = #{reportResult}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbPlotReportById" parameterType="Long" resultMap="TbPlotReportResult">
+        <include refid="selectTbPlotReportVo"/>
+        where report_id = #{reportId}
+    </select>
+        
+    <insert id="insertTbPlotReport" parameterType="TbPlotReport" useGeneratedKeys="true" keyProperty="reportId">
+        insert into tb_plot_report
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="reportName != null  and reportName != ''  ">report_name,</if>
+			<if test="reportCompany != null  and reportCompany != ''  ">report_company,</if>
+			<if test="reportTime != null  ">report_time,</if>
+			<if test="reportResult != null  and reportResult != ''  ">report_result,</if>
+			<if test="plotId != null  ">plot_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="reportName != null  and reportName != ''  ">#{reportName},</if>
+			<if test="reportCompany != null  and reportCompany != ''  ">#{reportCompany},</if>
+			<if test="reportTime != null  ">#{reportTime},</if>
+			<if test="reportResult != null  and reportResult != ''  ">#{reportResult},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+         </trim>
+    </insert>
+
+
+    <update id="updateTbPlotReport" parameterType="TbPlotReport">
+        update tb_plot_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reportName != null  and reportName != ''  ">report_name = #{reportName},</if>
+            <if test="reportCompany != null  and reportCompany != ''  ">report_company = #{reportCompany},</if>
+            <if test="reportTime != null  ">report_time = #{reportTime},</if>
+            <if test="reportResult != null  and reportResult != ''  ">report_result = #{reportResult},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+        </trim>
+        where report_id = #{reportId}
+    </update>
+
+	<delete id="deleteTbPlotReportById" >
+        delete from tb_plot_report where report_id = #{reportId} and plot_id = #{plotId}
+    </delete>
+	
+    <delete id="deleteTbPlotReportByIds" parameterType="String">
+        delete from tb_plot_report where report_id in 
+        <foreach item="reportId" collection="array" open="(" separator="," close=")">
+            #{reportId}
+        </foreach>
+    </delete>
+    
+</mapper>

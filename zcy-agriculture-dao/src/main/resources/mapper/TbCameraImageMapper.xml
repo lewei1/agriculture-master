@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbCameraImageMapper">
+    
+    <resultMap type="TbCameraImage" id="TbCameraImageResult">
+        <result property="picId"    column="pic_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="loc"    column="loc"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+	
+	<sql id="selectTbCameraImageVo">
+        select pic_id, dev_id, loc, create_time, farm_id from tb_camera_image
+    </sql>
+	
+    <select id="selectTbCameraImageList" parameterType="TbCameraImage" resultMap="TbCameraImageResult">
+        <include refid="selectTbCameraImageVo"/>
+        <where>  
+            <if test="picId != null "> and pic_id = #{picId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="loc != null  and loc != '' "> and loc = #{loc}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbCameraImageById" parameterType="Long" resultMap="TbCameraImageResult">
+        <include refid="selectTbCameraImageVo"/>
+        where pic_id = #{picId}
+    </select>
+        
+    <insert id="insertTbCameraImage" parameterType="TbCameraImage" useGeneratedKeys="true" keyProperty="picId">
+        insert into tb_camera_image
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">dev_id,</if>
+			<if test="loc != null  and loc != ''  ">loc,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">#{devId},</if>
+			<if test="loc != null  and loc != ''  ">#{loc},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbCameraImage" parameterType="TbCameraImage">
+        update tb_camera_image
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="loc != null  and loc != ''  ">loc = #{loc},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where pic_id = #{picId}
+    </update>
+
+	<delete id="deleteTbCameraImageById" parameterType="Long">
+        delete from tb_camera_image where pic_id = #{picId}
+    </delete>
+	
+    <delete id="deleteTbCameraImageByIds" parameterType="String">
+        delete from tb_camera_image where pic_id in 
+        <foreach item="picId" collection="array" open="(" separator="," close=")">
+            #{picId}
+        </foreach>
+    </delete>
+<!--     销售模板 H5页面 展示图片 -->
+    <select id="selectByH5Tp" parameterType="String" resultType="String">
+        SELECT
+			i.loc
+		FROM
+			tb_camera_image i
+		INNER JOIN (
+			SELECT
+				MAX(k.pic_id) AS pic_id
+			FROM
+				(
+					SELECT
+						t.pic_id,
+						t.dev_id
+					FROM
+						tb_camera_image t
+					INNER JOIN tb_res_device t1 ON t.dev_id = t1.dev_id
+					AND t1.dev_type = 4
+					WHERE
+						t.farm_id = #{farmId}
+					ORDER BY
+						t.pic_id DESC
+					LIMIT 100
+				) k
+			GROUP BY
+				k.dev_id
+		) i1 ON i.pic_id = i1.pic_id
+    </select>
+<!--     种植管理查询 图像记录 -->
+    <select id="selectByPlantingList" resultType="TbCameraImage">
+        SELECT
+			t.loc
+		FROM
+			tb_camera_image t
+		INNER JOIN tb_res_device t1 ON t.dev_id = t1.dev_id
+		INNER JOIN tb_plot t2 ON t1.plot_id = t2.plot_id
+		WHERE t1.plot_id=#{plotId}
+			<if test="createTimeStr !=null and createTimeStr !='' "> AND t.create_time >= STR_TO_DATE(#{createTimeStr},'%Y-%m-%d') </if>
+			<if test="createTimeEnd !=null and createTimeEnd !='' "> AND STR_TO_DATE(CONCAT(#{createTimeEnd}, ' 23:59:59'),'%Y-%m-%d %H:%i:%s') >= t.create_time </if>
+		ORDER BY t.pic_id DESC
+    </select>
+</mapper>

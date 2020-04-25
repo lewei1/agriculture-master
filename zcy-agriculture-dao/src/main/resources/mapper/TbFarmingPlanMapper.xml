@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbFarmingPlanMapper">
+    
+    <resultMap type="TbFarmingPlan" id="TbFarmingPlanResult">
+        <result property="planId"    column="plan_id"    />
+        <result property="planType"    column="plan_type"    />
+        <result property="farmingTypeId"    column="farming_type_id"    />
+        <result property="workHours"    column="work_hours"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="planRepeat"    column="plan_repeat"    />
+        <result property="planRepeatData"    column="plan_repeat_data"    />
+        <result property="planRepeatPlanId"    column="plan_repeat_plan_id"    />
+        <result property="machineId"    column="machine_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="planStatus"    column="plan_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="isLntelligence"    column="is_lntelligence"    />
+        <result property="dataId"    column="data_id"    />
+    </resultMap>
+    <resultMap type="org.zcy.agriculture.vo.FarmingPlanSpecialVo" id="TbFarmingPlanSpecial">
+        <result property="plotId"    column="plot_id"    />
+        <result property="plotName"    column="plot_name"    />
+        <result property="subPlotId"    column="sub_plot_id"    />
+        <result property="subPlotName"    column="sub_plot_name"    />
+        <collection  property="fp"  ofType="org.zcy.agriculture.vo.TbFarmingPlanVo">
+        	<result column="plan_id"    property="planId"    />
+        	<result column="farming_type_name"    property="farmingTypeName"    />
+        	<result column="plan_status"    property="planStatus"    />
+        	<result column="start_time"    property="startTime"    />
+        	<result column="end_time"    property="endTime"    />
+        	<result column="hangAir"    property="hangAir"    />
+        </collection >
+    </resultMap>
+    <resultMap type="org.zcy.agriculture.vo.TbFarmingTypeVo" id="TbAllList">
+        <result property="farmingTypeId"    column="farming_type_id"    />
+        <result property="farmingTypeName"    column="farming_type_name"    />
+        <collection  property="fp"  ofType="org.zcy.agriculture.vo.TbFarmingPlanVo">
+        	<result column="plan_id"    property="planId"    />
+        	<result column="plan_status"    property="planStatus"    />
+        	<result column="start_time"    property="startTime"    />
+        	<result column="end_time"    property="endTime"    />
+        </collection >
+    </resultMap>
+	
+	<sql id="selectTbFarmingPlanVo">
+        select plan_id, plan_type, farming_type_id, work_hours, start_time, end_time, plan_repeat,plan_repeat_data,plan_repeat_plan_id, machine_id, remark, plan_status, create_time, create_by, update_time, update_by, farm_id, is_lntelligence, data_id from tb_farming_plan
+    </sql>
+	
+    <select id="selectTbFarmingPlanList" parameterType="TbFarmingPlan" resultMap="TbFarmingPlanResult">
+        <include refid="selectTbFarmingPlanVo"/>
+        <where>  
+            <if test="planId != null "> and plan_id = #{planId}</if>
+             <if test="planType != null  and planType != '' "> and plan_type = #{planType}</if>
+             <if test="farmingTypeId != null "> and farming_type_id = #{farmingTypeId}</if>
+             <if test="workHours != null "> and work_hours = #{workHours}</if>
+             <if test="startTime != null "> and start_time = #{startTime}</if>
+             <if test="endTime != null "> and end_time = #{endTime}</if>
+             <if test="planRepeat != null "> and plan_repeat = #{planRepeat}</if>
+             <if test="machineId != null and machineId != '' "> and machine_id = #{machineId}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+             <if test="planStatus != null "> and plan_status = #{planStatus}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="isLntelligence != null "> and is_lntelligence = #{isLntelligence}</if>
+             <if test="dataId != null "> and data_id = #{dataId}</if>
+             <if test="today !=null and today !='' "> AND #{today} >= DATE_FORMAT(start_time, '%Y-%m-%d') AND DATE_FORMAT(end_time, '%Y-%m-%d') >= #{today}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbFarmingPlanById" parameterType="Long" resultMap="TbFarmingPlanResult">
+        <include refid="selectTbFarmingPlanVo"/>
+        where plan_id = #{planId}
+    </select>
+        
+    <insert id="insertTbFarmingPlan" parameterType="TbFarmingPlan"
+     useGeneratedKeys="true" keyProperty="planId">
+        insert into tb_farming_plan
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="planType != null  and planType != ''  ">plan_type,</if>
+			<if test="farmingTypeId != null  ">farming_type_id,</if>
+			<if test="workHours != null  ">work_hours,</if>
+			<if test="startTime != null  ">start_time,</if>
+			<if test="endTime != null  ">end_time,</if>
+			<if test="planRepeat != null  ">plan_repeat,</if>
+			<if test="planRepeatData != null  ">plan_repeat_data,</if>
+			<if test="planRepeatPlanId != null  ">plan_repeat_plan_id,</if>
+			<if test="machineId != null  and machineId != ''  ">machine_id,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="planStatus != null  ">plan_status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="isLntelligence != null  ">is_lntelligence,</if>
+			<if test="dataId != null  ">data_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="planType != null  and planType != ''  ">#{planType},</if>
+			<if test="farmingTypeId != null  ">#{farmingTypeId},</if>
+			<if test="workHours != null  ">#{workHours},</if>
+			<if test="startTime != null  ">#{startTime},</if>
+			<if test="endTime != null  ">#{endTime},</if>
+			<if test="planRepeat != null  ">#{planRepeat},</if>
+			<if test="planRepeatData != null  ">#{planRepeatData},</if>
+			<if test="planRepeatPlanId != null  ">#{planRepeatPlanId},</if>
+			<if test="machineId != null  and machineId != ''  ">#{machineId},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="planStatus != null  ">#{planStatus},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="isLntelligence != null  ">#{isLntelligence},</if>
+			<if test="dataId != null  ">#{dataId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbFarmingPlan" parameterType="TbFarmingPlan">
+        update tb_farming_plan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planType != null  and planType != ''  ">plan_type = #{planType},</if>
+            <if test="farmingTypeId != null  ">farming_type_id = #{farmingTypeId},</if>
+            <if test="workHours != null  ">work_hours = #{workHours},</if>
+            <if test="startTime != null  ">start_time = #{startTime},</if>
+            <if test="endTime != null  ">end_time = #{endTime},</if>
+            <if test="planRepeat != null  ">plan_repeat = #{planRepeat},</if>
+            <if test="planRepeatData != null  ">plan_repeat_data = #{planRepeatData},</if>
+            <if test="planRepeatPlanId != null  ">plan_repeat_plan_id = #{planRepeatPlanId},</if>
+            <if test="machineId != null  and machineId != ''  ">machine_id = #{machineId},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="planStatus != null  ">plan_status = #{planStatus},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="isLntelligence != null  ">is_lntelligence = #{isLntelligence},</if>
+            <if test="dataId != null  ">data_id = #{dataId},</if>
+        </trim>
+        where plan_id = #{planId}
+    </update>
+
+	<delete id="deleteTbFarmingPlanById" parameterType="Long">
+        delete from tb_farming_plan where plan_id = #{planId}
+    </delete>
+	
+    <delete id="deleteTbFarmingPlanByIds" parameterType="String">
+        delete from tb_farming_plan where plan_id in 
+        <foreach item="planId" collection="array" open="(" separator="," close=")">
+            #{planId}
+        </foreach>
+    </delete>
+    
+    <select id = "queryListByDate" resultType="org.zcy.agriculture.vo.FarmingPlanVo">
+    	SELECT
+			t.farming_type_name as planTypeName,
+			p.plan_status as planStatus,
+			p.start_time as startTime,
+			p.end_time as endTime,
+			plot.sub_plot_id as subPlotId 
+				FROM
+					tb_farming_plan p
+				LEFT JOIN tb_plan_plot plot ON p.plan_id = plot.plan_id
+				LEFT JOIN tb_farming_type t ON p.farming_type_id = t.farming_type_id
+				WHERE
+					p.farm_id = #{param.farmId}
+				AND p.is_lntelligence = 0
+				<![CDATA[ AND p.plan_status <> 1 ]]>
+				AND plot.sub_plot_id IN 
+				<foreach item="item" collection="list" open="(" separator="," close=")">
+		            #{item}
+		        </foreach>
+    </select>
+<!--     农事计划列表 -->
+    <select id = "selectBytjList" resultMap="TbFarmingPlanSpecial" parameterType="org.zcy.agriculture.vo.FarmingPlanSpecialVo">
+	    SELECT
+	    	t.plot_id,
+			t.plot_name,
+			t1.sub_plot_id,
+			t1.sub_plot_name,
+			t5.plan_id,
+			t5.farming_type_name,
+			t5.plan_status,
+			t5.start_time,
+			t5.end_time,
+			IF(t5.plan_id IS NOT NULL,(SELECT count(0) FROM tb_plan_participant s WHERE s.sub_plot_id=t1.sub_plot_id AND s.plan_id=t5.plan_id ),NULL) AS hangAir
+		FROM
+			tb_plot t
+		INNER JOIN tb_sub_plot t1 ON t.plot_id = t1.plot_id AND t.plot_status = 0 AND t1.sub_plot_status = 0 AND t.farm_id=#{farmId}
+		<if test="plotName !=null and plotName !='' "> AND t.plot_name LIKE CONCAT('%', #{plotName}, '%')</if>
+		<if test="plotId !=null ">AND t.plot_id=#{plotId}</if>
+		LEFT JOIN (
+			SELECT
+				t3.plan_id,
+				t4.farming_type_name,
+				t3.plan_status,
+				t2.sub_plot_id,
+				t3.start_time,
+				t3.end_time
+			FROM
+				tb_plan_plot t2
+			INNER JOIN tb_farming_plan t3 ON t2.plan_id = t3.plan_id AND t3.plan_status IN (0,2) AND t3.is_lntelligence=0
+			<if test="today !=null and today !='' "> AND STR_TO_DATE(CONCAT(#{today}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t3.start_time AND t3.end_time >= STR_TO_DATE(#{today}, '%Y-%m-%d')</if>
+			INNER JOIN tb_farming_type t4 ON t3.farming_type_id = t4.farming_type_id
+			<if test="currentUserCode !=null ">
+				WHERE (t3.plan_id IN(
+						SELECT
+							par.plan_id
+						FROM
+							tb_plan_participant par
+						WHERE
+							par.responser_id = #{currentUserCode} OR par.participant_id=#{currentUserCode}
+					) OR t3.create_by=#{currentUserCode})
+			</if>
+		) t5 ON t1.sub_plot_id = t5.sub_plot_id
+    </select>
+<!--     今天计划 -->
+    <select id="selectByTodayList" parameterType="org.zcy.agriculture.vo.TbFarmingPlanVo" resultType="org.zcy.agriculture.vo.TbFarmingPlanVo">
+        SELECT
+			t.plan_id AS planId,
+			t1.farming_type_id AS farmingTypeId,
+			t1.farming_type_name AS farmingTypeName,
+			t.start_time AS startTime,
+			t.end_time AS endTime,
+			t.plan_status AS planStatus
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status IN (0,2) AND t.farm_id=#{farmId} AND t.is_lntelligence=0
+		<if test="today !=null and today !='' "> AND STR_TO_DATE(CONCAT(#{today}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.start_time AND t.end_time >= STR_TO_DATE(#{today}, '%Y-%m-%d')</if>
+		INNER JOIN tb_plan_plot t2 ON t.plan_id = t2.plan_id
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0 AND t4.farm_id = #{farmId}
+		<if test="plotId !=null ">AND t4.plot_id=#{plotId}</if>
+		<if test="currentUserCode !=null ">
+			WHERE (t.plan_id IN(
+					SELECT
+						par.plan_id
+					FROM
+						tb_plan_participant par
+					WHERE
+						par.responser_id = #{currentUserCode} OR par.participant_id=#{currentUserCode}
+				) OR t.create_by=#{currentUserCode})
+		</if>
+    </select>
+<!--     全部计划 -->
+    <select id="selectByAllList" resultMap="TbAllList" parameterType="org.zcy.agriculture.vo.TbFarmingPlanVo">
+         SELECT
+         	t1.farming_type_id,
+			t1.farming_type_name,
+			t.plan_id,
+			t.start_time,
+			t.end_time,
+			t.plan_status
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status IN (0,2) AND t.farm_id=#{farmId} AND t.is_lntelligence=0
+		INNER JOIN tb_plan_plot t2 ON t.plan_id = t2.plan_id
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0 AND t4.farm_id = #{farmId}
+		<if test="plotId !=null ">AND t4.plot_id=#{plotId}</if>
+		<if test="currentUserCode !=null ">
+			WHERE (t.plan_id IN(
+					SELECT
+						par.plan_id
+					FROM
+						tb_plan_participant par
+					WHERE
+						par.responser_id = #{currentUserCode} OR par.participant_id=#{currentUserCode}
+				) OR t.create_by=#{currentUserCode})
+		</if>
+    </select>
+    <!--     计划列表-->
+    <select id="selectByPlanList" parameterType="org.zcy.agriculture.vo.TbFarmingPlanVo" resultType="org.zcy.agriculture.vo.TbFarmingPlanVo">
+        SELECT * FROM (
+        SELECT
+			t4.plot_name AS plotName,
+			t3.sub_plot_name AS subPlotName,
+			t1.farming_type_name AS farmingTypeName,
+			t.start_time AS startTime,
+			t.end_time AS endTime,
+			t.plan_id AS planId,
+			t.plan_status AS planStatus,
+			(CASE 
+		    	WHEN t.plan_status = 2 THEN 1
+		        WHEN NOW()>t.end_time  THEN 4
+		        WHEN NOW()>=t.start_time THEN 3
+		        WHEN t.start_time>NOW() THEN 2
+		    ELSE 0
+		    END) AS sort    
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status IN (0,2) AND t.farm_id=#{farmId} AND t.is_lntelligence=0
+		<if test="farmingTypeId !=null "> AND t.farming_type_id = #{farmingTypeId}</if>
+		<if test="planRepeatPlanId !=null "> AND t.plan_repeat_plan_id = #{planRepeatPlanId}</if>
+		INNER JOIN tb_plan_plot t2 ON t2.plan_id = t.plan_id
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		<if test="subPlotId !=null ">AND t2.sub_plot_id=#{subPlotId}</if>
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0
+		<if test="plotId !=null ">AND t4.plot_id=#{plotId}</if>
+		<if test="currentUserCode !=null ">
+			WHERE (t.plan_id IN(
+					SELECT
+						par.plan_id
+					FROM
+						tb_plan_participant par
+					WHERE
+						par.responser_id = #{currentUserCode} OR par.participant_id=#{currentUserCode}
+				) OR t.create_by=#{currentUserCode})
+		</if>
+		) s ORDER BY s.sort DESC,s.endTime ASC
+    </select>
+<!--     农事记录sql -->
+    <sql id="wdlsjl">
+        FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status = #{planStatus} AND t.is_lntelligence=0
+		INNER JOIN tb_plan_plot t2 ON t2.plan_id = t.plan_id
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0 AND t4.farm_id=#{farmId}
+		<where>
+			<if test="createTimeStr !=null and createTimeStr !='' ">AND t.create_time>=STR_TO_DATE(#{createTimeStr}, '%Y-%m-%d')</if>
+			<if test="createTimeEnd !=null and createTimeEnd !='' ">AND STR_TO_DATE(CONCAT(#{createTimeEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.create_time</if>
+			<if test="plotId !=null ">AND t4.plot_id=#{plotId}</if>
+			<if test="subPlotId !=null ">AND t3.sub_plot_id=#{subPlotId}</if>
+			<if test="tpyeRecord !=null ">AND t1.tpye_record=#{tpyeRecord}</if>
+			<if test="planStatus == 0 and nsTimeStr !=null and nsTimeStr !='' ">AND t.end_time>=STR_TO_DATE(#{nsTimeStr}, '%Y-%m-%d')</if>
+			<if test="planStatus == 0 and nsTimeEnd !=null and nsTimeEnd !='' ">AND STR_TO_DATE(CONCAT(#{nsTimeEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.start_time</if>
+			<if test="planStatus == 2 and nsTimeStr !=null and nsTimeStr !='' ">AND t.update_time>=STR_TO_DATE(#{nsTimeStr}, '%Y-%m-%d')</if>
+			<if test="planStatus == 2 and nsTimeEnd !=null and nsTimeEnd !='' ">AND STR_TO_DATE(CONCAT(#{nsTimeEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.update_time</if>
+			
+			<if test="plantingId !=null ">OR t.data_id=#{plantingId}</if>
+		</where>
+    </sql>
+<!--     农事记录  列表 -->
+	<select id="selectByLsRecordList" parameterType="org.zcy.agriculture.vo.FarmingRecordVo" resultType="org.zcy.agriculture.vo.FarmingRecordVo">
+        SELECT * FROM (
+        SELECT
+        	t4.plot_id AS plotId,
+			t4.plot_name AS plotName,
+			t3.sub_plot_id AS subPlotId,
+			t3.sub_plot_name AS subPlotName,
+			t1.farming_type_name AS farmingTypeName,
+			t.start_time AS startTime,
+			t.end_time AS endTime,
+			t.plan_id AS planId,
+			t.update_time AS updateTime,
+			t.create_time AS createTime,
+			t.plan_status AS planStatus,
+		 	(SELECT group_concat(CONCAT(m1.`material_name`,'(',m.material_amount,m.material_unit,')')) FROM tb_plan_material m INNER JOIN tb_article m1 ON m.material_id=m1.material_id WHERE m.plan_id=t.plan_id) AS `name`,
+			t1.tpye_record AS tpyeRecord,
+			(SELECT group_concat(CONCAT(IF(p1.user_code IS NULL,'',CONCAT(p1.nick_name, '|', p1.head_url)),';',IF(p2.user_code IS NULL,'',CONCAT(p2.nick_name, '|', p2.head_url))) separator ';') FROM tb_plan_participant p LEFT JOIN vb_user p1 ON p.responser_id=p1.user_code AND p1.farm_id=#{farmId} LEFT JOIN vb_user p2 ON p.participant_id=p2.user_code AND p2.farm_id=#{farmId} WHERE p.plan_id=t.plan_id AND p.sub_plot_id=t3.sub_plot_id ) AS userName,
+		 	(SELECT COUNT(0) FROM tb_plan_message k WHERE k.plan_id=t.plan_id AND k.`status`=0) AS msgCou 
+		<include refid="wdlsjl"/>
+		<choose>
+			<when test="planStatus == 2 and msgCou == 2">ORDER BY t.plan_id DESC</when>
+			<when test="planStatus == 2 ">ORDER BY t.update_time DESC,t.plan_id DESC</when>
+			<otherwise>ORDER BY t.plan_id DESC</otherwise>
+		</choose>
+		) k
+		LIMIT #{pageNo},#{pageSize}
+    </select>
+    <!--     农事记录  列表 -->
+	<select id="selectByLsRecordCou" parameterType="org.zcy.agriculture.vo.FarmingRecordVo" resultType="Integer">
+        SELECT
+			COUNT(0)
+		<include refid="wdlsjl"/>
+    </select>
+    <!--   农事记录 头部汇总  -->
+	<select id="selectByStatisticsCou" parameterType="org.zcy.agriculture.vo.FarmingRecordVo" resultType="org.zcy.agriculture.vo.FarmingRecordVo">
+        SELECT
+			t1.tpye_record AS tpyeRecord,
+			COUNT(0) AS msgCou
+		<include refid="wdlsjl"/>
+		GROUP BY t1.tpye_record
+    </select>
+<!--     智能计划列表 -->
+    <select id="selectBySmartPlanList" parameterType="org.zcy.agriculture.vo.TbFarmingPlanVo" resultType="org.zcy.agriculture.vo.FarmingRecordVo">
+        SELECT
+			t.plan_id AS planId,
+			t.work_hours AS workingHours,
+			t1.farming_type_name AS farmingTypeName,
+			t5.condition_var AS conditionVar,
+			t5.data_var AS dataVar,
+			(SELECT CONCAT( d.dev_name,'的',d1.attributes_name ) FROM tb_res_device d, tb_res_device_attributes d1 WHERE d.dev_id = d1.dev_id AND d.dev_id = t5.dev_id AND d1.thingsboard_key = t5.thingsboard_key ) AS devName,
+		  	(SELECT group_concat(CONCAT(IF(p1.user_code IS NULL,'',CONCAT(p1.nick_name, '|', p1.head_url,'|',p.plan_user_id,'|',p1.user_code)),';',IF(p2.user_code IS NULL,'',CONCAT(p2.nick_name, '|', p2.head_url,'|',p.plan_user_id,'|',p2.user_code))) separator ';') FROM tb_plan_participant p LEFT JOIN vb_user p1 ON p.responser_id=p1.user_code AND p1.farm_id=#{farmId} LEFT JOIN vb_user p2 ON p.participant_id=p2.user_code AND p2.farm_id=#{farmId} WHERE p.plan_id=t.plan_id AND p.sub_plot_id=t3.sub_plot_id ) AS userName
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status IN (0,2) AND t.is_lntelligence = 1 AND t.farm_id = #{farmId} 
+		<if test="today !=null and today !='' "> AND STR_TO_DATE(CONCAT(#{today}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.start_time AND t.end_time >= STR_TO_DATE(#{today}, '%Y-%m-%d')</if>
+		INNER JOIN tb_plan_plot t2 ON t2.plan_id = t.plan_id
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0
+		<if test="plotId !=null ">AND t4.plot_id=#{plotId}</if>
+		INNER JOIN tb_farming_plan_implement t5 ON t5.plan_id = t.plan_id
+		<if test="currentUserCode !=null ">
+			AND	t.create_by=#{currentUserCode}
+		</if>
+    </select>
+<!--     今日任务数，今日完成任务数 -->
+    <select id="selectByStatisticsToday"  resultType="HashMap">
+       SELECT
+			count(0) AS total,
+			SUM(IF(t.plan_status = 2 , 1, 0)) AS todayTotal
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_plan_plot t1 ON t.plan_id = t1.plan_id
+		INNER JOIN tb_sub_plot t3 ON t1.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0
+		AND t.is_lntelligence = 0
+		AND t.plan_status IN (0,2)
+		AND t4.plot_id = #{plotId}
+		AND STR_TO_DATE(CONCAT(#{today}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.start_time AND t.end_time >= STR_TO_DATE(#{today}, '%Y-%m-%d')
+    </select>
+<!--     首页农事展示状况 -->
+    <select id="selectByHomeList"  resultType="HashMap">
+       SELECT
+			t1.farming_type_name AS farmingTypeName,
+			t.update_time AS updateTime,
+			t2.nick_name AS nickName,
+			t2.head_url AS headUrl
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id AND t.plan_status = 2 AND t.farm_id = #{farmId} 
+		INNER JOIN vb_user t2 ON t.update_by = t2.user_code AND t2.farm_id=#{farmId}
+		ORDER BY t.update_time DESC,t.plan_id DESC
+		LIMIT 5
+    </select>
+<!--     首页任务完成情况 -->
+    <select id="selectByHomeTaskCompletion"  resultType="HashMap">
+        SELECT
+			COUNT(1) AS total,
+			IFNULL(SUM(IF(t3.plan_status = 2, 1, 0)),0) AS completeTotal,
+			IFNULL(SUM(IF(t3.end_time>=NOW() AND NOW()>=t3.start_time AND t3.plan_status = 0, 1, 0)),0) AS beginTotal,
+			IFNULL(SUM(IF((NOW()> t3.end_time OR t3.start_time>NOW()) AND t3.plan_status = 0, 1, 0)),0) AS notStartedTotal
+		FROM
+			tb_farming_plan t3,
+		 (
+			SELECT DISTINCT
+				t.plan_id
+			FROM
+				tb_farming_plan t
+			INNER JOIN tb_plan_plot t1 ON t1.plan_id = t.plan_id AND t.plan_status IN (0,2) 
+			INNER JOIN tb_plan_participant t2 ON t2.sub_plot_id = t1.sub_plot_id AND t2.plan_id=t1.plan_id
+			<if test="userId !=null "> AND (t2.responser_id=#{userId} OR t2.participant_id=#{userId})</if>
+			INNER JOIN tb_sub_plot t3 ON t1.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+			INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0 AND t4.farm_id=#{farmId}
+		) k WHERE t3.is_lntelligence=0 AND t3.plan_id = k.plan_id
+    </select>
+<!--     根据农场ID 和 用户ID查询 任务 -->
+    <select id="selectByFarmTask"  resultType="Integer">
+        SELECT
+			count(1) as cou
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_plan_plot t2 ON t2.plan_id = t.plan_id
+		INNER JOIN tb_plan_participant t1 ON t.plan_id = t1.plan_id AND t2.sub_plot_id = t1.sub_plot_id AND t.plan_status = 0 AND (t1.responser_id=#{userCode} OR t1.participant_id=#{userCode})
+		INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+		INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0
+    </select>
+    <!--   H5详情页面  任务 -->
+    <select id="selectByH5Task"  resultType="HashMap">
+        SELECT
+			t.plan_id AS planId,
+			IFNULL(DATE_FORMAT(t1.update_time,'%Y-%m-%d'),'') AS time,
+			t1.farming_type_name AS farmingTypeName,
+			IFNULL(t2.nick_name,'') AS nickName,
+			IFNULL(t2.head_url,'') AS headUrl,
+			(SELECT group_concat(CONCAT(t3.message_content, '|', t3.img_url) separator ';') FROM tb_plan_message t3 WHERE t.plan_id = t3.plan_id AND t3.`status` = 0 LIMIT 10 ) AS messageContent
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_type t1 ON t.farming_type_id = t1.farming_type_id
+		LEFT JOIN vb_user t2 ON (t.update_by = t2.user_code AND t2.farm_id = t.farm_id )
+		WHERE
+			t.is_lntelligence = 0
+		AND t.plan_status = 2
+		AND t.farm_id=#{farmId}
+		ORDER BY t1.update_time DESC,t.plan_id DESC
+		LIMIT 20
+    </select>
+    <update id="updateByFarmingPlanComplete" parameterType="String">
+        update tb_farming_plan SET plan_status =2,update_time=NOW() where plan_status = 0 AND plan_repeat = 0 AND is_lntelligence = 1 AND STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s') > end_time
+    </update>
+</mapper>

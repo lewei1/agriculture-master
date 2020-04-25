@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.irrigation.TbIrrigationFixQuantityMapper">
+    
+    <resultMap type="TbIrrigationFixQuantity" id="TbIrrigationFixQuantityResult">
+        <result property="fixQuantityId"    column="fix_quantity_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="sensor"    column="sensor"    />
+        <result property="contrast"    column="contrast"    />
+        <result property="contrastCondition"    column="contrast_condition"    />
+        <result property="openClose"    column="open_close"    />
+        <result property="actionTime"    column="action_time"    />
+        <result property="timeUnit"    column="time_unit"    />
+        <result property="fixQuantityStatus"    column="fix_quantity_status"    />
+        <result property="groupId"    column="group_id"    />
+    </resultMap>
+	
+	<sql id="selectTbIrrigationFixQuantityVo">
+        select fix_quantity_id, device_id, sensor, contrast, contrast_condition, open_close, action_time, time_unit, fix_quantity_status, group_id from tb_irrigation_fix_quantity
+    </sql>
+	
+    <select id="selectTbIrrigationFixQuantityList" parameterType="TbIrrigationFixQuantity" resultMap="TbIrrigationFixQuantityResult">
+        <include refid="selectTbIrrigationFixQuantityVo"/>
+        <where>  
+            <if test="fixQuantityId != null "> and fix_quantity_id = #{fixQuantityId}</if>
+             <if test="deviceId != null "> and device_id = #{deviceId}</if>
+             <if test="sensor != null  and sensor != '' "> and sensor = #{sensor}</if>
+             <if test="contrast != null "> and contrast = #{contrast}</if>
+             <if test="contrastCondition != null "> and contrast_condition = #{contrastCondition}</if>
+             <if test="openClose != null "> and open_close = #{openClose}</if>
+             <if test="actionTime != null "> and action_time = #{actionTime}</if>
+             <if test="timeUnit != null  and timeUnit != '' "> and time_unit = #{timeUnit}</if>
+             <if test="fixQuantityStatus != null "> and fix_quantity_status = #{fixQuantityStatus}</if>
+             <if test="groupId != null "> and group_id = #{groupId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbIrrigationFixQuantityById" parameterType="Long" resultMap="TbIrrigationFixQuantityResult">
+        <include refid="selectTbIrrigationFixQuantityVo"/>
+        where fix_quantity_id = #{fixQuantityId}
+    </select>
+        
+    <insert id="insertTbIrrigationFixQuantity" parameterType="TbIrrigationFixQuantity" useGeneratedKeys="true" keyProperty="fixQuantityId">
+        insert into tb_irrigation_fix_quantity
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceId != null  ">device_id,</if>
+			<if test="sensor != null  and sensor != ''  ">sensor,</if>
+			<if test="contrast != null  ">contrast,</if>
+			<if test="contrastCondition != null  ">contrast_condition,</if>
+			<if test="openClose != null  ">open_close,</if>
+			<if test="actionTime != null  ">action_time,</if>
+			<if test="timeUnit != null  and timeUnit != ''  ">time_unit,</if>
+			<if test="fixQuantityStatus != null  ">fix_quantity_status,</if>
+			<if test="groupId != null  ">group_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="deviceId != null  ">#{deviceId},</if>
+			<if test="sensor != null  and sensor != ''  ">#{sensor},</if>
+			<if test="contrast != null  ">#{contrast},</if>
+			<if test="contrastCondition != null  ">#{contrastCondition},</if>
+			<if test="openClose != null  ">#{openClose},</if>
+			<if test="actionTime != null  ">#{actionTime},</if>
+			<if test="timeUnit != null  and timeUnit != ''  ">#{timeUnit},</if>
+			<if test="fixQuantityStatus != null  ">#{fixQuantityStatus},</if>
+			<if test="groupId != null  ">#{groupId},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertIrrigationFixQuantityList" parameterType="java.util.List">
+        INSERT INTO tb_irrigation_fix_quantity(
+            device_id,
+            sensor,
+            contrast,
+            contrast_condition,
+            open_close,
+            action_time,
+            time_unit,
+            group_id
+        )VALUES
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.deviceId},
+            #{item.sensor},
+            #{item.contrast},
+            #{item.contrastCondition},
+            #{item.openClose},
+            #{item.actionTime},
+            #{item.timeUnit},
+            #{item.groupId}
+            )
+        </foreach>
+    </insert>
+	 
+    <update id="updateTbIrrigationFixQuantity" parameterType="TbIrrigationFixQuantity">
+        update tb_irrigation_fix_quantity
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceId != null  ">device_id = #{deviceId},</if>
+            <if test="sensor != null  and sensor != ''  ">sensor = #{sensor},</if>
+            <if test="contrast != null  ">contrast = #{contrast},</if>
+            <if test="contrastCondition != null  ">contrast_condition = #{contrastCondition},</if>
+            <if test="openClose != null  ">open_close = #{openClose},</if>
+            <if test="actionTime != null  ">action_time = #{actionTime},</if>
+            <if test="timeUnit != null  and timeUnit != ''  ">time_unit = #{timeUnit},</if>
+            <if test="fixQuantityStatus != null  ">fix_quantity_status = #{fixQuantityStatus},</if>
+            <if test="groupId != null  ">group_id = #{groupId},</if>
+        </trim>
+        where fix_quantity_id = #{fixQuantityId}
+    </update>
+
+    <update id="updateIrrigationFixQuantityByGroupId">
+        UPDATE tb_irrigation_fix_quantity SET fix_quantity_status = #{fixQuantityStatus} WHERE group_id = #{groupId}
+    </update>
+
+	<delete id="deleteTbIrrigationFixQuantityById" parameterType="Long">
+        delete from tb_irrigation_fix_quantity where fix_quantity_id = #{fixQuantityId}
+    </delete>
+
+	<delete id="deleteIrrigationFixQuantityByGroupId" parameterType="Long">
+        delete from tb_irrigation_fix_quantity where group_id = #{groupId}
+    </delete>
+
+    <delete id="deleteTbIrrigationFixQuantityByIds" parameterType="String">
+        delete from tb_irrigation_fix_quantity where fix_quantity_id in 
+        <foreach item="fixQuantityId" collection="array" open="(" separator="," close=")">
+            #{fixQuantityId}
+        </foreach>
+    </delete>
+    
+</mapper>

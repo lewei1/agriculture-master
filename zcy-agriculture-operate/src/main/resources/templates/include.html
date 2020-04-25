@@ -1,0 +1,147 @@
+<head th:fragment="header">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title></title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<link rel="shortcut icon" href="favicon.ico">
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+	<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+	<!-- bootstrap-table 表格插件样式 -->
+	<link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/bootstrap-treetable/bootstrap-treetable.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.css}" rel="stylesheet"/>
+	<link th:href="@{/css/animate.css}" rel="stylesheet"/>
+	<link th:href="@{/css/style.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/select/select2.css}" rel="stylesheet"/>
+	<link th:href="@{/numberone/css/ry-ui.css}" rel="stylesheet"/>
+
+	<script type="text/javascript">
+        var useUpload;
+        var imageUrlPre = 'http://172.16.5.240:8103';
+
+        String.prototype.trim = function(c) {
+            if (c) {
+                var temp = this;
+                if (temp.indexOf(c) == 0) {
+                	temp = temp.replace(c, '');
+            	}
+            	var end = temp.length-c.length;
+                if (temp.lastIndexOf(c) == end) {
+                    temp = temp.substr(0,end);
+                }
+                return temp.toString();
+            }
+            return this.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+        }
+
+        Date.prototype.format = function(format)
+        {
+            var o = {
+                "M+" : this.getMonth()+1, //month
+                "d+" : this.getDate(),    //day
+                "h+" : this.getHours(),   //hour
+                "m+" : this.getMinutes(), //minute
+                "s+" : this.getSeconds(), //second
+                "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+                "S" : this.getMilliseconds() //millisecond
+            }
+            if(/(y+)/.test(format)) format=format.replace(RegExp.$1,
+                (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+            for(var k in o)if(new RegExp("("+ k +")").test(format))
+                format = format.replace(RegExp.$1,
+                    RegExp.$1.length==1 ? o[k] :
+                        ("00"+ o[k]).substr((""+ o[k]).length));
+            return format;
+        }
+	</script>
+</head>
+<div th:fragment="footer">
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	
+	<!-- bootstrap-table 表格插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-table/bootstrap-table.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js}"></script>
+	<!-- jquery-validate 表单验证插件 -->
+	<script th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
+	<script th:src="@{/ajax/libs/validate/messages_zh.min.js}"></script>
+	<script th:src="@{/ajax/libs/validate/jquery.validate.extend.js}"></script>
+	<!-- jquery-validate 表单树插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-treetable/bootstrap-treetable.js}"></script>
+	<!-- jquery-export 表格导出插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/bootstrap-table-export.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/tableExport.js}"></script>
+	<!-- 遮罩层 -->
+	<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+	<script th:src="@{/ajax/libs/iCheck/icheck.min.js}"></script>
+	<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+	<script th:src="@{/ajax/libs/layui/layui.js}"></script>
+	<script th:src="@{/numberone/js/common.js?v=3.2.0}"></script>
+	<script th:src="@{/numberone/js/ry-ui.js?v=3.2.0}"></script>
+	<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+
+	<script type="text/javascript">
+
+        var upload;
+
+        $(function () {
+            if (useUpload) {
+                layui.use('upload', function () {
+                    upload = layui.upload;
+                });
+            }
+        });
+
+        function uploadImgInit(upid,hid) {
+            if (!upload || !upid || !hid) {
+            	return;
+            }
+            //图片上传
+            var uploadInst = upload.render({
+                elem: upid
+                ,url: '/admin/common/upload'
+                ,accept: 'file' //普通文件
+                ,acceptMime: 'image/*'
+                ,field:'file'
+                ,exts: 'jpg|JPEG|PNG' //只允许上传指定格式
+                ,size: 1024*5 //限定大小
+                , before: function (obj) {
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function (index, file, result) {
+                        $(upid).parent().find(".layui-upload-img").attr('src', result); //图片链接（base64）
+                    });
+                }
+                , done: function (res) {
+                    //如果上传失败
+                    if (res.code != 0) {
+                        layer.msg('上传失败，'+res.msg);
+                        uploadfail(upid,uploadInst);
+                        return;
+                    }
+                    //上传成功
+                    $(hid).val(res.url);
+                    var demoText = $(upid).parent().find('.demoText');
+                    demoText.hide();
+                }
+                , error: function () {
+                    uploadfail(upid,uploadInst);
+                }
+            });
+        }
+        function uploadfail(id,uploadInst){
+
+            //演示失败状态，并实现重传
+            var demoText = $(id).parent().find('.demoText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function () {
+                if (uploadInst){
+                    uploadInst.upload();
+                }
+            });
+        }
+	</script>
+</div>

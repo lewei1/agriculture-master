@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbAlarmRecordMapper">
+    
+    <resultMap type="TbAlarmRecord" id="TbAlarmRecordResult">
+        <result property="id"    column="id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devType"    column="dev_type"    />
+        <result property="typesIndex"    column="types_index"    />
+        <result property="realValue"    column="real_value"    />
+        <result property="lessOrMore"    column="less_or_more"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectTbAlarmRecordVo">
+        select id, farm_id, plot_id, dev_id, dev_type, types_index, real_value, less_or_more, create_time from tb_alarm_record
+    </sql>
+	
+    <select id="selectTbAlarmRecordList" parameterType="TbAlarmRecord" resultMap="TbAlarmRecordResult">
+        <include refid="selectTbAlarmRecordVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devType != null "> and dev_type = #{devType}</if>
+             <if test="typesIndex != null "> and types_index = #{typesIndex}</if>
+             <if test="realValue != null "> and real_value = #{realValue}</if>
+             <if test="lessOrMore != null "> and less_or_more = #{lessOrMore}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbAlarmRecordById" parameterType="Long" resultMap="TbAlarmRecordResult">
+        <include refid="selectTbAlarmRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbAlarmRecord" parameterType="TbAlarmRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_alarm_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devType != null  ">dev_type,</if>
+			<if test="typesIndex != null  ">types_index,</if>
+			<if test="realValue != null  ">real_value,</if>
+			<if test="lessOrMore != null  ">less_or_more,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devType != null  ">#{devType},</if>
+			<if test="typesIndex != null  ">#{typesIndex},</if>
+			<if test="realValue != null  ">#{realValue},</if>
+			<if test="lessOrMore != null  ">#{lessOrMore},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbAlarmRecord" parameterType="TbAlarmRecord">
+        update tb_alarm_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devType != null  ">dev_type = #{devType},</if>
+            <if test="typesIndex != null  ">types_index = #{typesIndex},</if>
+            <if test="realValue != null  ">real_value = #{realValue},</if>
+            <if test="lessOrMore != null  ">less_or_more = #{lessOrMore},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbAlarmRecordById" parameterType="Long">
+        delete from tb_alarm_record where id = #{id}
+    </delete>
+	
+    <delete id="deleteTbAlarmRecordByIds" parameterType="String">
+        delete from tb_alarm_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectCountBetweenTheTime"  resultType="Long">
+         select count(*) num from tb_alarm_record where create_time  <![CDATA[ >= ]]> #{startTime} and create_time <![CDATA[ < ]]> #{endTime}
+    </select>
+
+    <select id="selectCountBetweenTheTimeByPlotId"  resultType="Long">
+         select count(*) num from tb_alarm_record where farm_id = #{farmId} and plot_id = #{plotId}  and create_time  <![CDATA[ >= ]]> #{startTime} and create_time <![CDATA[ < ]]> #{endTime}
+    </select>
+
+    <select id="selectCountBetweenTheTimestamp"  resultType="Long">
+        select count(*) num from tb_alarm_record WHERE (unix_timestamp(create_time)%-57600)%86400 <![CDATA[ >= ]]>#{startT} <![CDATA[ && (unix_timestamp(create_time)-57600)%86400 < ]]> #{endT}
+    </select>
+	<!-- 首页统计报警参数分布 -->
+	<select id="selectByStatisticsList" parameterType="String" resultType="HashMap">
+         SELECT
+			k.typesIndex,
+			k.cou AS value
+		FROM
+			(
+				SELECT
+					t.types_index AS typesIndex,
+					count(0) AS cou
+				FROM
+					tb_alarm_record t
+				WHERE
+					t.farm_id = #{farmId} AND t.create_time>=STR_TO_DATE(#{createTimeStr}, '%Y-%m-%d')
+				GROUP BY
+					t.types_index
+			) k
+		ORDER BY
+			k.cou
+    </select>
+    <!-- 首页统计  设备统计中的当然报警 -->
+    <select id="selectByStatisticsDateList" parameterType="String" resultType="HashMap">
+         SELECT
+				count(0) AS cou
+			FROM
+				tb_alarm_record t
+			WHERE 
+				t.farm_id = #{farmId}
+			AND t.create_time >= STR_TO_DATE(#{createTimeStr},'%Y-%m-%d %H:%i:%s')
+				<if test="createTimeEnd !=null and createTimeEnd !='' "> AND STR_TO_DATE(#{createTimeEnd},'%Y-%m-%d %H:%i:%s') >= t.create_time </if>
+				<if test="devType !=null "> AND t.dev_type=#{devType} </if>
+    </select>
+
+
+</mapper>

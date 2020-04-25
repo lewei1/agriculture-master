@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbMerchantMapper">
+    
+    <resultMap type="TbMerchant" id="TbMerchantResult">
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="merchantCode"    column="merchant_code"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="headUrl"    column="head_url"    />
+        <result property="account"    column="account"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="password"    column="password"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="roleId"    column="role_id"    />
+    </resultMap>
+	
+	<sql id="selectTbMerchantVo">
+        select merchant_id, merchant_code, nick_name, head_url, account, phone, email, password, company_name, status, create_time, create_by, update_time, update_by, role_id from tb_merchant
+    </sql>
+	
+    <select id="selectTbMerchantList" parameterType="TbMerchant" resultMap="TbMerchantResult">
+        <include refid="selectTbMerchantVo"/>
+        <where>  
+            <if test="merchantId != null "> and merchant_id = #{merchantId}</if>
+            <if test="merchantCode != null and merchantCode != '' "> and merchant_code = #{merchantCode}</if>
+             <if test="nickName != null  and nickName != '' "> and nick_name = #{nickName}</if>
+             <if test="headUrl != null  and headUrl != '' "> and head_url = #{headUrl}</if>
+             <if test="account != null  and account != '' "> and account = #{account}</if>
+             <if test="phone != null  and phone != '' "> and phone = #{phone}</if>
+             <if test="email != null  and email != '' "> and email = #{email}</if>
+             <if test="password != null  and password != '' "> and password = #{password}</if>
+             <if test="companyName != null  and companyName != '' "> and company_name = #{companyName}</if>
+             <if test="status != null "> and status = #{status}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="roleId != null "> and role_id = #{roleId}</if>
+            and status = 1
+         </where>
+    </select>
+    
+    <select id="selectTbMerchantById" parameterType="Long" resultMap="TbMerchantResult">
+        <include refid="selectTbMerchantVo"/>
+        where merchant_id = #{merchantId}
+    </select>
+        
+    <insert id="insertTbMerchant" parameterType="TbMerchant" useGeneratedKeys="true" keyProperty="merchantId">
+        insert into tb_merchant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="merchantCode != null  and merchantCode != ''  ">merchant_code,</if>
+			<if test="nickName != null  and nickName != ''  ">nick_name,</if>
+			<if test="headUrl != null  and headUrl != ''  ">head_url,</if>
+			<if test="account != null  and account != ''  ">account,</if>
+			<if test="phone != null  and phone != ''  ">phone,</if>
+			<if test="email != null  and email != ''  ">email,</if>
+			<if test="password != null  and password != ''  ">password,</if>
+			<if test="companyName != null  and companyName != ''  ">company_name,</if>
+			<if test="status != null  ">status,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="roleId != null  ">role_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="merchantCode != null  and merchantCode != ''  ">#{merchantCode},</if>
+			<if test="nickName != null  and nickName != ''  ">#{nickName},</if>
+			<if test="headUrl != null  and headUrl != ''  ">#{headUrl},</if>
+			<if test="account != null  and account != ''  ">#{account},</if>
+			<if test="phone != null  and phone != ''  ">#{phone},</if>
+			<if test="email != null  and email != ''  ">#{email},</if>
+			<if test="password != null  and password != ''  ">#{password},</if>
+			<if test="companyName != null  and companyName != ''  ">#{companyName},</if>
+			<if test="status != null  ">#{status},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="roleId != null  ">#{roleId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbMerchant" parameterType="TbMerchant">
+        update tb_merchant
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="merchantCode != null  and merchantCode != ''  ">merchant_code = #{merchantCode},</if>
+            <if test="nickName != null  and nickName != ''  ">nick_name = #{nickName},</if>
+            <if test="headUrl != null  and headUrl != ''  ">head_url = #{headUrl},</if>
+            <if test="account != null  and account != ''  ">account = #{account},</if>
+            <if test="phone != null  and phone != ''  ">phone = #{phone},</if>
+            <if test="email != null  and email != ''  ">email = #{email},</if>
+            <if test="password != null  and password != ''  ">password = #{password},</if>
+            <if test="companyName != null  and companyName != ''  ">company_name = #{companyName},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="roleId != null  ">role_id = #{roleId},</if>
+        </trim>
+        where merchant_id = #{merchantId}
+    </update>
+
+    <update id="updateMerchantPasswordByParam" parameterType="PasswordRetrieveParam">
+        UPDATE tb_merchant
+        SET password = #{newPassword}
+        WHERE
+            phone = #{phone}
+    </update>
+
+	<delete id="deleteTbMerchantById" parameterType="Long">
+        delete from tb_merchant where merchant_id = #{merchantId}
+    </delete>
+	
+    <delete id="deleteTbMerchantByIds" parameterType="String">
+        delete from tb_merchant where merchant_id in 
+        <foreach item="merchantId" collection="array" open="(" separator="," close=")">
+            #{merchantId}
+        </foreach>
+    </delete>
+    
+</mapper>

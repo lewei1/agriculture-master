@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.agriculture</groupId>
+		<artifactId>zcy-agriculture</artifactId>
+		<version>1.0</version>
+	</parent>
+	<artifactId>zcy-agriculture-service</artifactId>
+	<name>zcy-agriculture-service</name>
+	<url>http://maven.apache.org</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.agriculture</groupId>
+			<artifactId>zcy-agriculture-dao</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	<!--<dependencies>
+		<dependency>
+			<groupId>com.agriculture</groupId>
+			<artifactId>zcy-agriculture-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.1.16</version>
+		</dependency>
+		&lt;!&ndash;Mybatis &ndash;&gt;
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		&lt;!&ndash;MySQL &ndash;&gt;
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>1.2.10</version>
+		</dependency>
+
+    </dependencies>-->
+</project>

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbHarvestMapper">
+    
+    <resultMap type="TbHarvest" id="TbHarvestResult">
+        <result property="harvestId"    column="harvest_id"    />
+        <result property="plotId"    column="plot_id"    />
+        <result property="subPlotId"    column="sub_plot_id"    />
+        <result property="harvestSpecId"    column="harvest_spec_id"    />
+        <result property="harvestTime"    column="harvest_time"    />
+        <result property="harvestAmount"    column="harvest_amount"    />
+        <result property="cropLevel"    column="crop_level"    />
+        <result property="freshDay"    column="fresh_day"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="plantingId"    column="planting_id"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+	
+	<sql id="selectTbHarvestVo">
+        select harvest_id, plot_id, sub_plot_id, harvest_spec_id, harvest_time, harvest_amount, crop_level, fresh_day, user_id, user_name, remark, create_time, create_by, update_time, update_by, farm_id, planting_id,status from tb_harvest
+    </sql>
+	
+    <select id="selectTbHarvestList" parameterType="TbHarvest" resultMap="TbHarvestResult">
+        <include refid="selectTbHarvestVo"/>
+        <where>  
+            <if test="harvestId != null "> and harvest_id = #{harvestId}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+             <if test="subPlotId != null "> and sub_plot_id = #{subPlotId}</if>
+             <if test="harvestSpecId != null "> and harvest_spec_id = #{harvestSpecId}</if>
+             <if test="harvestTime != null "> and harvest_time = #{harvestTime}</if>
+             <if test="harvestAmount != null "> and harvest_amount = #{harvestAmount}</if>
+             <if test="cropLevel != null  and cropLevel != '' "> and crop_level = #{cropLevel}</if>
+             <if test="freshDay != null "> and fresh_day = #{freshDay}</if>
+             <if test="userId != null  and userId != '' "> and user_id = #{userId}</if>
+             <if test="userName != null  and userName != '' "> and user_name = #{userName}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="plantingId != null "> and planting_id = #{plantingId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbHarvestById" parameterType="Long" resultMap="TbHarvestResult">
+        <include refid="selectTbHarvestVo"/>
+        where harvest_id = #{harvestId}
+    </select>
+        
+    <insert id="insertTbHarvest" parameterType="TbHarvest" useGeneratedKeys="true" keyProperty="harvestId">
+        insert into tb_harvest
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="plotId != null  ">plot_id,</if>
+			<if test="subPlotId != null  ">sub_plot_id,</if>
+			<if test="harvestSpecId != null  ">harvest_spec_id,</if>
+			<if test="harvestTime != null  ">harvest_time,</if>
+			<if test="harvestAmount != null  ">harvest_amount,</if>
+			<if test="cropLevel != null  and cropLevel != ''  ">crop_level,</if>
+			<if test="freshDay != null  ">fresh_day,</if>
+			<if test="userId != null  and userId != ''  ">user_id,</if>
+			<if test="userName != null  and userName != ''  ">user_name,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="plantingId != null  ">planting_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="plotId != null  ">#{plotId},</if>
+			<if test="subPlotId != null  ">#{subPlotId},</if>
+			<if test="harvestSpecId != null  ">#{harvestSpecId},</if>
+			<if test="harvestTime != null  ">#{harvestTime},</if>
+			<if test="harvestAmount != null  ">#{harvestAmount},</if>
+			<if test="cropLevel != null  and cropLevel != ''  ">#{cropLevel},</if>
+			<if test="freshDay != null  ">#{freshDay},</if>
+			<if test="userId != null  and userId != ''  ">#{userId},</if>
+			<if test="userName != null  and userName != ''  ">#{userName},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="plantingId != null  ">#{plantingId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbHarvest" parameterType="TbHarvest">
+        update tb_harvest
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+            <if test="subPlotId != null  ">sub_plot_id = #{subPlotId},</if>
+            <if test="harvestSpecId != null  ">harvest_spec_id = #{harvestSpecId},</if>
+            <if test="harvestTime != null  ">harvest_time = #{harvestTime},</if>
+            <if test="harvestAmount != null  ">harvest_amount = #{harvestAmount},</if>
+            <if test="cropLevel != null  and cropLevel != ''  ">crop_level = #{cropLevel},</if>
+            <if test="freshDay != null  ">fresh_day = #{freshDay},</if>
+            <if test="userId != null  and userId != ''  ">user_id = #{userId},</if>
+            <if test="userName != null  and userName != ''  ">user_name = #{userName},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="plantingId != null  ">planting_id = #{plantingId},</if>
+        </trim>
+        where harvest_id = #{harvestId}
+    </update>
+
+	<delete id="deleteTbHarvestById" parameterType="Long">
+        delete from tb_harvest where harvest_id = #{harvestId}
+    </delete>
+	
+    <delete id="deleteTbHarvestByIds" parameterType="String">
+        delete from tb_harvest where harvest_id in 
+        <foreach item="harvestId" collection="array" open="(" separator="," close=")">
+            #{harvestId}
+        </foreach>
+    </delete>
+<!--      汇总式采收列表 -->
+    <select id="selectByCshz" parameterType="org.zcy.agriculture.vo.TbHarvestVo" resultType="org.zcy.agriculture.vo.TbHarvestVo">
+        SELECT * FROM (
+        SELECT
+			MAX(t.plot_id) AS plotId,
+			(SELECT t1.plot_name from tb_plot t1 where t1.plot_id=MAX(t.plot_id)) AS plotName,
+			t.sub_plot_id AS subPlotId,
+			(SELECT t2.sub_plot_name from tb_sub_plot t2 where t2.sub_plot_id=t.sub_plot_id) AS subPlotName,
+			t.planting_id AS plantingId,
+			(SELECT t4.category_name from tb_planting t3,tb_crop_category t4 where t3.crop_category_id=t4.crop_category_id AND t3.planting_id=t.planting_id) AS categoryName,
+			count(0) AS cou,
+			MAX(t.harvest_time) AS harvestTime,
+			SUM(t.harvest_amount) AS harvestAmount
+		FROM
+			tb_harvest t
+		WHERE t.`status` = 0 AND t.farm_id=#{farmId}
+		GROUP BY
+			t.sub_plot_id,
+			t.planting_id
+		) k
+		LIMIT #{pageNo},#{pageSize}
+    </select>
+<!--     汇总式采收列表查询总条数 -->
+    <select id="selectByCshzListCou" parameterType="org.zcy.agriculture.vo.TbHarvestVo" resultType="Integer">
+        SELECT count(0) FROM (
+		SELECT
+			t.harvest_id
+		FROM
+			tb_harvest t
+		WHERE
+			t.`status` = 0 AND t.farm_id = #{farmId}
+		GROUP BY
+			t.sub_plot_id,
+			t.planting_id
+		) k
+    </select>
+<!--     采收记录 -->
+    <select id="selectByCsjlList" parameterType="org.zcy.agriculture.vo.TbHarvestVo" resultType="org.zcy.agriculture.vo.TbHarvestVo">
+        SELECT
+        	t.harvest_id AS harvestId,
+			t.plot_id AS plotId,
+			t1.plot_name AS plotName,
+			t.sub_plot_id AS subPlotId,
+			t2.sub_plot_name AS subPlotName,
+			t.planting_id AS plantingId,
+			t4.category_name AS category_name,
+			t.harvest_time AS harvestTime,
+			t.harvest_amount AS harvestAmount,
+			t.user_name AS userName,
+			t.crop_level AS cropLevel,
+			t5.spec_name AS specName,
+			t.status,
+			t.remark,
+			t.fresh_day AS freshDay,
+			t.user_id AS userId,
+			(SELECT group_concat(i.img_url) FROM tb_harvest_img i WHERE i.harvest_id=t.harvest_id) AS imgUrl,
+			t.harvest_spec_id AS harvestSpecId,
+			@rank :=@rank + 1 AS rankNo
+		FROM
+			tb_harvest t
+		INNER JOIN tb_plot t1 ON t1.plot_id = t.plot_id
+		INNER JOIN tb_sub_plot t2 ON t2.sub_plot_id = t.sub_plot_id
+		INNER JOIN tb_planting t3 ON t3.planting_id = t.planting_id
+		INNER JOIN tb_crop_category t4 ON t3.crop_category_id = t4.crop_category_id
+		INNER JOIN tb_harvest_spec t5 ON t.harvest_spec_id = t5.harvest_spec_id
+		INNER JOIN (SELECT @rank := 0) b
+		WHERE
+			t.status = 0
+		AND t.sub_plot_id = #{subPlotId}
+		AND t.planting_id = #{plantingId}
+		<if test="harvestStr !=null and harvestStr !='' ">AND t.harvest_time>=STR_TO_DATE(#{harvestStr}, '%Y-%m-%d')</if>
+		<if test="harvestEnd !=null and harvestEnd !='' ">AND STR_TO_DATE(CONCAT(#{harvestEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.harvest_time</if>
+    </select>
+	<!--     批量删除 -->
+    <update id="updateTbHarvestBatch" parameterType="java.util.List">
+        update tb_harvest SET status = 1,update_time=#{harvestList[0].updateTime},update_by=#{harvestList[0].updateBy}
+        WHERE  harvest_id IN ( 
+        <foreach collection ="harvestList" item="tti" index= "index" separator =",">
+            #{tti.harvestId}
+        </foreach >
+        )
+    </update>
+    <!--      采收统计列表 -->
+    <select id="selectByStatistics" parameterType="org.zcy.agriculture.vo.TbHarvestVo" resultType="org.zcy.agriculture.vo.TbHarvestExportVo">
+        SELECT * FROM (
+        SELECT
+			t.plot_id AS plotId,
+			(SELECT t1.plot_name from tb_plot t1 where t1.plot_id=t.plot_id) AS plotName,
+			t.sub_plot_id AS subPlotId,
+			(SELECT CONCAT(t2.sub_plot_name,',',IFNULL((SELECT u.nick_name FROM vb_user u WHERE u.user_code=t2.sub_plot_person AND u.farm_id=#{farmId}),'')) from tb_sub_plot t2 where t2.sub_plot_id=t.sub_plot_id) AS subPlotName,
+			t.planting_id AS plantingId,
+			(SELECT t4.category_name from tb_planting t3,tb_crop_category t4 where t3.crop_category_id=t4.crop_category_id AND t3.planting_id=t.planting_id) AS categoryName,
+			(SELECT t5.spec_name FROM tb_harvest_spec t5 WHERE t.harvest_spec_id =t5.harvest_spec_id) AS specName,
+			SUM(t.harvest_amount) AS harvestAmount,
+			t.crop_level AS cropLevel
+		FROM
+			tb_harvest t
+		WHERE t.status = 0 
+		AND t.farm_id=#{farmId}
+		<if test="harvestStr !=null and harvestStr !='' ">AND t.harvest_time>=STR_TO_DATE(#{harvestStr}, '%Y-%m-%d')</if>
+		<if test="harvestEnd !=null and harvestEnd !='' ">AND STR_TO_DATE(CONCAT(#{harvestEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.harvest_time</if>
+		GROUP BY
+			t.plot_id,
+			t.sub_plot_id,
+			t.planting_id,
+			t.harvest_spec_id,
+			t.crop_level
+		) k
+		LIMIT #{pageNo},#{pageSize}
+    </select>
+<!--     采收统计列表总条数 -->
+    <select id="selectByStatisticsCou" parameterType="org.zcy.agriculture.vo.TbHarvestVo" resultType="Integer">
+        SELECT count(0) FROM (
+        SELECT
+			t.harvest_id
+		FROM
+			tb_harvest t
+		WHERE t.status = 0 
+		AND t.farm_id=#{farmId}
+		<if test="harvestStr !=null and harvestStr !='' ">AND t.harvest_time>=STR_TO_DATE(#{harvestStr}, '%Y-%m-%d')</if>
+		<if test="harvestEnd !=null and harvestEnd !='' ">AND STR_TO_DATE(CONCAT(#{harvestEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.harvest_time</if>
+		GROUP BY
+			t.plot_id,
+			t.sub_plot_id,
+			t.planting_id,
+			t.harvest_spec_id,
+			t.crop_level
+		) k
+    </select>
+<!--     今日采收 汇总 -->
+    <select id="selectByStatisticsToDay" resultType="org.zcy.agriculture.vo.TbHarvestVo" parameterType="org.zcy.agriculture.vo.TbHarvestVo">
+        SELECT
+			k.toHr,
+			SUM(k.harvest_amount) AS harvestAmount
+		FROM
+			(
+				SELECT
+					DATE_FORMAT(t.harvest_time, '%m-%d') AS toHr,
+					t.harvest_amount
+				FROM
+					tb_harvest t
+				WHERE
+					t.harvest_time>=STR_TO_DATE(#{harvestStr}, '%Y-%m-%d')
+				AND	STR_TO_DATE(CONCAT(#{harvestEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.harvest_time
+				AND t.`status` = 0
+				AND t.plot_id = #{plotId}
+			) k
+		GROUP BY
+			k.toHr
+    </select>
+    <!--     昨日采收 汇总 -->
+    <select id="selectByStatisticsYesterday" resultType="org.zcy.agriculture.vo.TbHarvestVo" parameterType="org.zcy.agriculture.vo.TbHarvestVo">
+        SELECT
+			SUM(t.harvest_amount) AS harvestAmount
+		FROM
+			tb_harvest t
+		WHERE
+			t.harvest_time>=STR_TO_DATE(#{harvestStr}, '%Y-%m-%d')
+		AND	STR_TO_DATE(CONCAT(#{harvestEnd}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s') >= t.harvest_time
+		AND t.`status` = 0
+		AND t.plot_id = #{plotId}
+    </select>
+	<select id="selectCountBetweenTheTime"  resultType="Long">
+         select count(*) num from tb_harvest where harvest_time  <![CDATA[ >= ]]> #{startTime} and harvest_time <![CDATA[ < ]]> #{endTime}
+    </select>
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.irrigation.TbIrrigationTimingMapper">
+    
+    <resultMap type="TbIrrigationTiming" id="TbIrrigationTimingResult">
+        <result property="timingId"    column="timing_id"    />
+        <result property="openTime"    column="open_time"    />
+        <result property="openPeriod"    column="open_period"    />
+        <result property="timeUnit"    column="time_unit"    />
+        <result property="loopOrNot"    column="loop_or_not"    />
+        <result property="loopCount"    column="loop_count"    />
+        <result property="spacingTime"    column="spacing_time"    />
+        <result property="spacingPeriod"    column="spacing_period"    />
+        <result property="timingStatus"    column="timing_status"    />
+        <result property="groupId"    column="group_id"    />
+    </resultMap>
+	
+	<sql id="selectTbIrrigationTimingVo">
+        select timing_id, open_time, open_period, time_unit, loop_or_not, loop_count, spacing_time, spacing_period, timing_status, group_id from tb_irrigation_timing
+    </sql>
+	
+    <select id="selectTbIrrigationTimingList" parameterType="TbIrrigationTiming" resultMap="TbIrrigationTimingResult">
+        <include refid="selectTbIrrigationTimingVo"/>
+        <where>  
+            <if test="timingId != null "> and timing_id = #{timingId}</if>
+             <if test="openTime != null and openTime != '' "> and open_time = #{openTime}</if>
+             <if test="openPeriod != null "> and open_period = #{openPeriod}</if>
+             <if test="timeUnit != null  and timeUnit != '' "> and time_unit = #{timeUnit}</if>
+             <if test="loopOrNot != null "> and loop_or_not = #{loopOrNot}</if>
+             <if test="loopCount != null "> and loop_count = #{loopCount}</if>
+             <if test="spacingTime != null "> and spacing_time = #{spacingTime}</if>
+             <if test="spacingPeriod != null  and spacingPeriod != '' "> and spacing_period = #{spacingPeriod}</if>
+             <if test="timingStatus != null "> and timing_status = #{timingStatus}</if>
+             <if test="groupId != null "> and group_id = #{groupId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbIrrigationTimingById" parameterType="Long" resultMap="TbIrrigationTimingResult">
+        <include refid="selectTbIrrigationTimingVo"/>
+        where timing_id = #{timingId}
+    </select>
+        
+    <insert id="insertTbIrrigationTiming" parameterType="TbIrrigationTiming" useGeneratedKeys="true" keyProperty="timingId">
+        insert into tb_irrigation_timing
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="openTime != null and openTime != ''  ">open_time,</if>
+			<if test="openPeriod != null  ">open_period,</if>
+			<if test="timeUnit != null  and timeUnit != ''  ">time_unit,</if>
+			<if test="loopOrNot != null  ">loop_or_not,</if>
+			<if test="loopCount != null  ">loop_count,</if>
+			<if test="spacingTime != null  ">spacing_time,</if>
+			<if test="spacingPeriod != null  and spacingPeriod != ''  ">spacing_period,</if>
+			<if test="timingStatus != null  ">timing_status,</if>
+			<if test="groupId != null  ">group_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="openTime != null and openTime != ''  ">#{openTime},</if>
+			<if test="openPeriod != null  ">#{openPeriod},</if>
+			<if test="timeUnit != null  and timeUnit != ''  ">#{timeUnit},</if>
+			<if test="loopOrNot != null  ">#{loopOrNot},</if>
+			<if test="loopCount != null  ">#{loopCount},</if>
+			<if test="spacingTime != null  ">#{spacingTime},</if>
+			<if test="spacingPeriod != null  and spacingPeriod != ''  ">#{spacingPeriod},</if>
+			<if test="timingStatus != null  ">#{timingStatus},</if>
+			<if test="groupId != null  ">#{groupId},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertTbIrrigationTimingList" parameterType="java.util.List">
+        INSERT INTO tb_irrigation_timing(
+            open_time,
+            open_period,
+            time_unit,
+            loop_or_not,
+            loop_count,
+            spacing_time,
+            spacing_period,
+            group_id
+        )VALUES
+        <foreach collection="list" separator="," item="item">
+            (
+                #{item.openTime},
+                #{item.openPeriod},
+                #{item.timeUnit},
+                #{item.loopOrNot},
+                #{item.loopCount},
+                #{item.spacingTime},
+                #{item.spacingPeriod},
+                #{item.groupId}
+            )
+        </foreach>
+    </insert>
+	 
+    <update id="updateTbIrrigationTiming" parameterType="TbIrrigationTiming">
+        update tb_irrigation_timing
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openTime != null and openTime != ''  ">open_time = #{openTime},</if>
+            <if test="openPeriod != null  ">open_period = #{openPeriod},</if>
+            <if test="timeUnit != null  and timeUnit != ''  ">time_unit = #{timeUnit},</if>
+            <if test="loopOrNot != null  ">loop_or_not = #{loopOrNot},</if>
+            <if test="loopCount != null  ">loop_count = #{loopCount},</if>
+            <if test="spacingTime != null  ">spacing_time = #{spacingTime},</if>
+            <if test="spacingPeriod != null  and spacingPeriod != ''  ">spacing_period = #{spacingPeriod},</if>
+            <if test="timingStatus != null  ">timing_status = #{timingStatus},</if>
+            <if test="groupId != null  ">group_id = #{groupId},</if>
+        </trim>
+        where timing_id = #{timingId}
+    </update>
+
+    <update id="updateTbIrrigationTimingByGroupId" >
+        UPDATE tb_irrigation_timing SET timing_status = #{timingStatus} WHERE group_id = #{groupId}
+    </update>
+
+	<delete id="deleteTbIrrigationTimingById" parameterType="Long">
+        delete from tb_irrigation_timing where timing_id = #{timingId}
+    </delete>
+
+	<delete id="deleteTbIrrigationTimingByGroupId" parameterType="Long">
+        delete from tb_irrigation_timing where group_id = #{groupId}
+    </delete>
+
+    <delete id="deleteTbIrrigationTimingByIds" parameterType="String">
+        delete from tb_irrigation_timing where timing_id in 
+        <foreach item="timingId" collection="array" open="(" separator="," close=")">
+            #{timingId}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.plot.TbReportImgMapper">
+    
+    <resultMap type="TbReportImg" id="TbReportImgResult">
+        <result property="reportImgId"    column="report_img_id"    />
+        <result property="reportId"    column="report_id"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="reportSequence"    column="report_sequence"    />
+    </resultMap>
+	
+	<sql id="selectTbReportImgVo">
+        select report_img_id, report_id, img_url, report_sequence from tb_report_img
+    </sql>
+	
+    <select id="selectTbReportImgList" parameterType="TbReportImg" resultMap="TbReportImgResult">
+        <include refid="selectTbReportImgVo"/>
+        <where>  
+            <if test="reportImgId != null "> and report_img_id = #{reportImgId}</if>
+             <if test="reportId != null "> and report_id = #{reportId}</if>
+             <if test="imgUrl != null  and imgUrl != '' "> and img_url = #{imgUrl}</if>
+             <if test="reportSequence != null "> and report_sequence = #{reportSequence}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbReportImgById" parameterType="Long" resultMap="TbReportImgResult">
+        <include refid="selectTbReportImgVo"/>
+        where report_img_id = #{reportImgId}
+    </select>
+
+    <select id="selectReportFirstImgById" parameterType="Long" resultType="String">
+        select
+            img_url
+        from
+            tb_report_img
+        where
+            report_id = #{reportId}
+        order by report_sequence
+        limit 0,1
+    </select>
+        
+    <insert id="insertTbReportImg" parameterType="TbReportImg" useGeneratedKeys="true" keyProperty="reportImgId">
+        insert into tb_report_img
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="reportId != null  ">report_id,</if>
+			<if test="imgUrl != null  and imgUrl != ''  ">img_url,</if>
+			<if test="reportSequence != null  ">report_sequence,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="reportId != null  ">#{reportId},</if>
+			<if test="imgUrl != null  and imgUrl != ''  ">#{imgUrl},</if>
+			<if test="reportSequence != null  ">#{reportSequence},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertTbReportImgList" parameterType="java.util.List">
+        insert into tb_report_img(
+            img_url,
+            report_sequence,
+            report_id
+        )VALUES
+        <foreach collection="list" separator="," item="item">
+            (
+                #{item.imgUrl},
+                #{item.reportSequence},
+                #{item.reportId}
+            )
+        </foreach>
+    </insert>
+	 
+    <update id="updateTbReportImg" parameterType="TbReportImg">
+        update tb_report_img
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reportId != null  ">report_id = #{reportId},</if>
+            <if test="imgUrl != null  and imgUrl != ''  ">img_url = #{imgUrl},</if>
+            <if test="reportSequence != null  ">report_sequence = #{reportSequence},</if>
+        </trim>
+        where report_img_id = #{reportImgId}
+    </update>
+
+	<delete id="deleteTbReportImgById" parameterType="Long">
+        delete from tb_report_img where report_img_id = #{reportImgId}
+    </delete>
+	
+    <delete id="deleteTbReportImgByIds" parameterType="String">
+        delete from tb_report_img where report_img_id in 
+        <foreach item="reportImgId" collection="array" open="(" separator="," close=")">
+            #{reportImgId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTbReportImgByReportId" parameterType="Long">
+        delete from tb_report_img where report_id = #{reportId}
+    </delete>
+    
+</mapper>

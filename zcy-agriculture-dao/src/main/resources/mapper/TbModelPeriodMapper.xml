@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.model.TbModelPeriodMapper">
+    
+    <resultMap type="TbModelPeriod" id="TbModelPeriodResult">
+        <result property="periodId"    column="period_id"    />
+        <result property="periodName"    column="period_name"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="modelId"    column="model_id"    />
+    </resultMap>
+    <resultMap type="org.zcy.agriculture.entity.TbModelPeriodAndFarmings" id="TbFarmingAllList">
+        <result property="periodName"    column="period_name"    />
+        <result property="periodId"    column="period_id"    />
+        <collection  property="farmingList"  ofType="org.zcy.agriculture.entity.TbModelPeriodFarming">
+        	<result column="farming_id"    property="farmingId"    />
+        	<result column="farming_type_name"    property="farmingTypeName"    />
+        	<result column="plant_type"    property="plantType"    />
+        	<result column="plant_day"    property="plantDay"    />
+        	<result column="farming_requirements"    property="farmingRequirements"    />
+        </collection >
+    </resultMap>
+	
+	<sql id="selectTbModelPeriodVo">
+        select period_id, period_name, start_time, end_time, model_id from tb_model_period
+    </sql>
+	
+    <select id="selectTbModelPeriodList" parameterType="TbModelPeriod" resultMap="TbModelPeriodResult">
+        <include refid="selectTbModelPeriodVo"/>
+        <where>  
+            <if test="periodId != null "> and period_id = #{periodId}</if>
+             <if test="periodName != null  and periodName != '' "> and period_name = #{periodName}</if>
+             <if test="startTime != null  and startTime != '' "> and start_time = #{startTime}</if>
+             <if test="endTime != null  and endTime != '' "> and end_time = #{endTime}</if>
+             <if test="modelId != null "> and model_id = #{modelId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbModelPeriodById" parameterType="Long" resultMap="TbModelPeriodResult">
+        <include refid="selectTbModelPeriodVo"/>
+        where period_id = #{periodId}
+    </select>
+        
+    <insert id="insertTbModelPeriod" parameterType="TbModelPeriod" useGeneratedKeys="true" keyProperty="periodId">
+        insert into tb_model_period
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="periodName != null  and periodName != ''  ">period_name,</if>
+			<if test="startTime != null  and startTime != ''  ">start_time,</if>
+			<if test="endTime != null  and endTime != ''  ">end_time,</if>
+			<if test="modelId != null  ">model_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="periodName != null  and periodName != ''  ">#{periodName},</if>
+			<if test="startTime != null  and startTime != ''  ">#{startTime},</if>
+			<if test="endTime != null  and endTime != ''  ">#{endTime},</if>
+			<if test="modelId != null  ">#{modelId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbModelPeriod" parameterType="TbModelPeriod">
+        update tb_model_period
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="periodName != null  and periodName != ''  ">period_name = #{periodName},</if>
+            <if test="startTime != null  and startTime != ''  ">start_time = #{startTime},</if>
+            <if test="endTime != null  and endTime != ''  ">end_time = #{endTime},</if>
+            <if test="modelId != null  ">model_id = #{modelId},</if>
+        </trim>
+        where period_id = #{periodId}
+    </update>
+
+	<delete id="deleteTbModelPeriodById" parameterType="Long">
+        delete from tb_model_period where period_id = #{periodId}
+    </delete>
+	
+    <delete id="deleteTbModelPeriodByIds" parameterType="String">
+        delete from tb_model_period where period_id in 
+        <foreach item="periodId" collection="array" open="(" separator="," close=")">
+            #{periodId}
+        </foreach>
+    </delete>
+<!--     根据种植作物，作物标准， 作物环境查询模型 -->
+    <select id="selectByCropCategoryList" resultMap="TbFarmingAllList">
+        SELECT
+			t.period_name,
+			t.period_id,
+			t1.farming_id,
+			t2.farming_type_name,
+			IF(t1.plant_day=0,'定植当天',CONCAT(t1.plant_type,t1.plant_day,'天')) AS plant_type,
+			t1.plant_day,
+			t1.farming_requirements
+		FROM
+			tb_model_period t
+		INNER JOIN tb_model_period_farming t1 ON t.period_id = t1.period_id
+		INNER JOIN tb_farming_type t2 ON t1.farming_type_id = t2.farming_type_id
+		INNER JOIN tb_model t3 ON t.model_id = t3.model_id
+		WHERE
+			t3.model_id=#{modelId}
+		AND t3.farm_id = #{farmId}
+		AND t3.model_status = 0
+    </select>
+</mapper>

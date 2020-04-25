@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbWarehouseRecordMapper">
+
+    <resultMap type="TbWarehouseRecord" id="TbWarehouseRecordResult">
+        <result property="inId"    column="in_id"    />
+        <result property="inOutType"    column="in_out_type"    />
+        <result property="inOutTypeId"    column="in_out_type_id"    />
+        <result property="number"    column="number"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="article"    column="article"    />
+        <result property="materialTypeId"    column="material_type_id"    />
+        <!--这个tpye要注意，数据库取名太简单了，映射名字不一样-->
+        <result property="materialTypeName"    column="type"    />
+        <result property="method"    column="method"    />
+        <result property="unit"    column="unit"    />
+        <result property="unitName" column="unit_name"/>
+        <result property="quantity"    column="quantity"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="operatorName"    column="operator_name"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="farmId"    column="farm_id"    />
+    </resultMap>
+
+	<sql id="selectTbWarehouseRecordVo">
+        select in_id, in_out_type, in_out_type_id, number, material_id, article, type, method, unit, quantity, operator_id, remarks, create_time, create_by, update_time, update_by, warehouse_id, farm_id from tb_warehouse_record
+    </sql>
+
+    <select id="selectTbWarehouseRecordList" parameterType="TbWarehouseRecord" resultMap="TbWarehouseRecordResult">
+        SELECT
+        twr.in_id,
+        twr.in_out_type,
+        twr.in_out_type_id,
+        twr.number,
+        twr.material_id,
+        twr.article,
+        twr.method,
+        twr.unit,
+        tut1.type_name as unit_name,
+        twr.quantity,
+        twr.operator_id,
+        vu.nick_name as operator_name,
+        twr.remarks,
+        twr.create_time,
+        twr.create_by,
+        twr.update_time,
+        twr.update_by,
+        twr.warehouse_id,
+        twr.farm_id,
+        tat.material_type_id,
+        tat.type_name AS `type`
+        FROM
+        tb_warehouse_record twr
+        LEFT JOIN tb_article ta ON ta.material_id = twr.material_id
+        LEFT JOIN tb_article_type tat ON ta.material_type_id = tat.material_type_id
+        LEFT JOIN tb_unit_type tut1 ON twr.unit = tut1.material_unit_id
+        LEFT JOIN vb_user vu ON vu.user_code = twr.operator_id and vu.farm_id = twr.farm_id
+        <where>
+            <if test="warehouseId != null  "> and twr.warehouse_id= #{warehouseId}</if>
+            <if test="inOutType != null  and inOutType != '' "> and twr.in_out_type = #{inOutType}</if>
+            <if test="materialTypeId != null "> and tat.material_type_id = #{materialTypeId}</if>
+            <if test="article != null  and article != '' "> and (twr.number LIKE CONCAT('%',#{article},'%') or twr.article LIKE CONCAT('%',#{article},'%'))</if>
+            <if test="farmId != null  and farmId != '' "> and twr.farm_id = #{farmId}</if>
+         </where>
+        order by twr.create_time desc
+    </select>
+
+    <select id="selectTbWarehouseRecordListByName" parameterType="TbWarehouseRecord" resultMap="TbWarehouseRecordResult">
+        <include refid="selectTbWarehouseRecordVo"/>
+        <where>
+            <if test="inOutType != null  and inOutType != '' "> and in_out_type = #{inOutType}</if>
+            <if test="number != null  and number != '' "> and number LIKE CONCAT('%',#{number},'%')</if>
+            <if test="article != null  and article != '' "> and article LIKE CONCAT('%',#{article},'%')</if>
+            <if test="materialTypeName != null  and materialTypeName != '' "> and type = #{materialTypeName}</if>
+        </where>
+    </select>
+
+    <select id="selectTbWarehouseRecordById" parameterType="TbWarehouseRecord" resultMap="TbWarehouseRecordResult">
+        select twr.in_id, twr.in_out_type, twr.in_out_type_id, twr.number, twr.material_id, twr.article, twr.type, twr.method, twr.unit, twr.quantity,
+         twr.operator_id,
+         vu.nick_name as operator_name,
+         twr.remarks, twr.create_time, twr.create_by, twr.update_time, twr.update_by, twr.warehouse_id, twr.farm_id
+         from tb_warehouse_record twr
+         LEFT JOIN vb_user vu ON vu.user_code = twr.operator_id and vu.farm_id = tt.farm_id
+        where twr.in_id = #{inId} and twr.farm_id = #{farmId}
+    </select>
+
+    <insert id="insertTbWarehouseRecord" parameterType="TbWarehouseRecord" useGeneratedKeys="true" keyProperty="inId">
+        insert into tb_warehouse_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">in_out_type,</if>
+			<if test="inOutTypeId != null  ">in_out_type_id,</if>
+			<if test="number != null  and number != ''  ">number,</if>
+			<if test="materialId != null  ">material_id,</if>
+			<if test="article != null  and article != ''  ">article,</if>
+			<if test="materialTypeName != null  and materialTypeName != ''  ">type,</if>
+			<if test="method != null  and method != ''  ">method,</if>
+			<if test="unit != null  and unit != ''  ">unit,</if>
+			<if test="quantity != null  ">quantity,</if>
+			<if test="operatorId != null ">operator_id,</if>
+			<if test="remarks != null  and remarks != ''  ">remarks,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+			<if test="warehouseId != null  ">warehouse_id,</if>
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inOutType != null  and inOutType != ''  ">#{inOutType},</if>
+			<if test="inOutTypeId != null  ">#{inOutTypeId},</if>
+			<if test="number != null  and number != ''  ">#{number},</if>
+			<if test="materialId != null  ">#{materialId},</if>
+			<if test="article != null  and article != ''  ">#{article},</if>
+			<if test="materialTypeName != null  and materialTypeName != ''  ">#{materialTypeName},</if>
+			<if test="method != null  and method != ''  ">#{method},</if>
+			<if test="unit != null ">#{unit},</if>
+			<if test="quantity != null  ">#{quantity},</if>
+			<if test="operatorId != null ">#{operatorId},</if>
+			<if test="remarks != null  and remarks != ''  ">#{remarks},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+			<if test="warehouseId != null  ">#{warehouseId},</if>
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTbWarehouseRecord" parameterType="TbWarehouseRecord">
+        update tb_warehouse_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inOutType != null  and inOutType != ''  ">in_out_type = #{inOutType},</if>
+            <if test="inOutTypeId != null  ">in_out_type_id = #{inOutTypeId},</if>
+            <if test="number != null  and number != ''  ">number = #{number},</if>
+            <if test="materialId != null  ">material_id = #{materialId},</if>
+            <if test="article != null  and article != ''  ">article = #{article},</if>
+            <if test="materialTypeName != null  and materialTypeName != ''  ">type = #{materialTypeName},</if>
+            <if test="method != null  and method != ''  ">method = #{method},</if>
+            <if test="unit != null ">unit = #{unit},</if>
+            <if test="quantity != null  ">quantity = #{quantity},</if>
+            <if test="operatorId != null ">operator = #{operatorId},</if>
+            <if test="remarks != null  and remarks != ''  ">remarks = #{remarks},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="warehouseId != null  ">warehouse_id = #{warehouseId},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where in_id = #{inId}
+    </update>
+
+	<delete id="deleteTbWarehouseRecordById" parameterType="TbWarehouseRecord">
+        delete from tb_warehouse_record where in_id = #{inId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbWarehouseRecordByIds" parameterType="String">
+        delete from tb_warehouse_record where in_id in
+        <foreach item="inId" collection="array" open="(" separator="," close=")">
+            #{inId}
+        </foreach>
+    </delete>
+<!--     根据当前农场查询 出库和 入库数量 -->
+    <select id="selectByTodayStatistics" parameterType="String" resultType="org.zcy.agriculture.vo.TbWarehouseRecordVo">
+        SELECT
+			t.in_out_type AS inOutType,
+			count(0) AS quantity
+		FROM
+			tb_warehouse_record t
+		WHERE
+			t.farm_id = #{farmId}
+		AND DATE_FORMAT(t.create_time, '%Y%m%d') = #{today}
+		GROUP BY
+			t.in_out_type
+    </select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbArticleTypeMapper">
+    
+    <resultMap type="TbArticleType" id="TbArticleTypeResult">
+        <result property="materialTypeId"    column="material_type_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+	
+	<sql id="selectTbArticleTypeVo">
+        select material_type_id, farm_id, type_name, create_time, create_by, update_time, update_by from tb_article_type
+    </sql>
+	
+    <select id="selectTbArticleTypeList" parameterType="TbArticleType" resultMap="TbArticleTypeResult">
+        <include refid="selectTbArticleTypeVo"/>
+        <where>  
+            <if test="materialTypeId != null "> and material_type_id = #{materialTypeId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="typeName != null  and typeName != '' "> and type_name = #{typeName}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+             <if test="updateBy != null "> and update_by = #{updateBy}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbArticleTypeById" parameterType="TbArticleType" resultMap="TbArticleTypeResult">
+        <include refid="selectTbArticleTypeVo"/>
+        where material_type_id = #{materialTypeId} and farm_id = #{farmId}
+    </select>
+        
+    <insert id="insertTbArticleType" parameterType="TbArticleType" useGeneratedKeys="true" keyProperty="materialTypeId">
+        insert into tb_article_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="typeName != null  and typeName != ''  ">type_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="updateBy != null  ">update_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="typeName != null  and typeName != ''  ">#{typeName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="updateBy != null  ">#{updateBy},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbArticleType" parameterType="TbArticleType">
+        update tb_article_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="typeName != null  and typeName != ''  ">type_name = #{typeName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+        </trim>
+        where material_type_id = #{materialTypeId}
+    </update>
+
+	<delete id="deleteTbArticleTypeById" parameterType="TbArticleType">
+        delete from tb_article_type where material_type_id = #{materialTypeId} and farm_id = #{farmId}
+    </delete>
+	
+    <delete id="deleteTbArticleTypeByIds" parameterType="String">
+        delete from tb_article_type where material_type_id in 
+        <foreach item="materialTypeId" collection="array" open="(" separator="," close=")">
+            #{materialTypeId}
+        </foreach>
+    </delete>
+    
+</mapper>

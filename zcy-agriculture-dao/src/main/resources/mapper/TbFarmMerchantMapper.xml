@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbFarmMerchantMapper">
+    
+    <resultMap type="TbFarmMerchant" id="TbFarmMerchantResult">
+        <result property="farmMerchantId"    column="farm_merchant_id"    />
+        <result property="farmId"    column="farm_id"    />
+        <result property="merchantId"    column="merchant_id"    />
+    </resultMap>
+	
+	<sql id="selectTbFarmMerchantVo">
+        select farm_merchant_id, farm_id, merchant_id from tb_farm_merchant
+    </sql>
+	
+    <select id="selectTbFarmMerchantList" parameterType="TbFarmMerchant" resultMap="TbFarmMerchantResult">
+        <include refid="selectTbFarmMerchantVo"/>
+        <where>  
+            <if test="farmMerchantId != null "> and farm_merchant_id = #{farmMerchantId}</if>
+             <if test="farmId != null  and farmId != '' "> and farm_id = #{farmId}</if>
+             <if test="merchantId != null "> and merchant_id = #{merchantId}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbFarmMerchantById" parameterType="Long" resultMap="TbFarmMerchantResult">
+        <include refid="selectTbFarmMerchantVo"/>
+        where farm_merchant_id = #{farmMerchantId}
+    </select>
+
+
+        
+    <insert id="insertTbFarmMerchant" parameterType="TbFarmMerchant" useGeneratedKeys="true" keyProperty="farmMerchantId">
+        insert into tb_farm_merchant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">farm_id,</if>
+			<if test="merchantId != null  ">merchant_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+			<if test="merchantId != null  ">#{merchantId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbFarmMerchant" parameterType="TbFarmMerchant">
+        update tb_farm_merchant
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+            <if test="merchantId != null  ">merchant_id = #{merchantId},</if>
+        </trim>
+        where farm_merchant_id = #{farmMerchantId}
+    </update>
+
+	<delete id="deleteTbFarmMerchantById" parameterType="Long">
+        delete from tb_farm_merchant where farm_merchant_id = #{farmMerchantId}
+    </delete>
+	
+    <delete id="deleteTbFarmMerchantByIds" parameterType="String">
+        delete from tb_farm_merchant where farm_merchant_id in 
+        <foreach item="farmMerchantId" collection="array" open="(" separator="," close=")">
+            #{farmMerchantId}
+        </foreach>
+    </delete>
+    
+</mapper>

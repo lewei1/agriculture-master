@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbSubPlotMapper">
+    
+    <resultMap type="TbSubPlot" id="TbSubPlotResult">
+        <result property="subPlotId"    column="sub_plot_id"    />
+        <result property="subPlotName"    column="sub_plot_name"    />
+        <result property="subPlotPerson"    column="sub_plot_person"    />
+        <result property="subPlotStatus"    column="sub_plot_status"    />
+        <result property="subPlotAcreage"    column="sub_plot_acreage"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="plotId"    column="plot_id"    />
+    </resultMap>
+	
+	<sql id="selectTbSubPlotVo">
+        select sub_plot_id, sub_plot_name, sub_plot_person, sub_plot_status, sub_plot_acreage, create_time, create_by, plot_id from tb_sub_plot
+    </sql>
+	
+    <select id="selectTbSubPlotList" parameterType="TbSubPlot" resultMap="TbSubPlotResult">
+        <include refid="selectTbSubPlotVo"/>
+        <where>  
+            <if test="subPlotId != null "> and sub_plot_id = #{subPlotId}</if>
+             <if test="subPlotName != null  and subPlotName != '' "> and sub_plot_name = #{subPlotName}</if>
+             <if test="subPlotPerson != null "> and sub_plot_person = #{subPlotPerson}</if>
+             <if test="subPlotAcreage != null "> and sub_plot_acreage = #{subPlotAcreage}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="createBy != null "> and create_by = #{createBy}</if>
+             <if test="plotId != null "> and plot_id = #{plotId}</if>
+            and sub_plot_status = 0
+         </where>
+    </select>
+    
+    <select id="selectTbSubPlotById" parameterType="Long" resultMap="TbSubPlotResult">
+        <include refid="selectTbSubPlotVo"/>
+        where sub_plot_id = #{subPlotId} AND sub_plot_status = 0
+    </select>
+        
+    <insert id="insertTbSubPlot" parameterType="TbSubPlot">
+        insert into tb_sub_plot
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="subPlotId != null  ">sub_plot_id,</if>
+			<if test="subPlotName != null  and subPlotName != ''  ">sub_plot_name,</if>
+			<if test="subPlotPerson != null  ">sub_plot_person,</if>
+			<if test="subPlotStatus != null  ">sub_plot_status,</if>
+			<if test="subPlotAcreage != null  ">sub_plot_acreage,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createBy != null  ">create_by,</if>
+			<if test="plotId != null  ">plot_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="subPlotId != null  ">#{subPlotId},</if>
+			<if test="subPlotName != null  and subPlotName != ''  ">#{subPlotName},</if>
+			<if test="subPlotPerson != null  ">#{subPlotPerson},</if>
+			<if test="subPlotStatus != null  ">#{subPlotStatus},</if>
+			<if test="subPlotAcreage != null  ">#{subPlotAcreage},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createBy != null  ">#{createBy},</if>
+			<if test="plotId != null  ">#{plotId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbSubPlot" parameterType="TbSubPlot">
+        update tb_sub_plot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subPlotName != null  and subPlotName != ''  ">sub_plot_name = #{subPlotName},</if>
+            <if test="subPlotPerson != null  ">sub_plot_person = #{subPlotPerson},</if>
+            <if test="subPlotStatus != null  ">sub_plot_status = #{subPlotStatus},</if>
+            <if test="subPlotAcreage != null  ">sub_plot_acreage = #{subPlotAcreage},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="plotId != null  ">plot_id = #{plotId},</if>
+        </trim>
+        where sub_plot_id = #{subPlotId}
+    </update>
+
+	<update id="deleteTbSubPlotById" parameterType="Long">
+        update tb_sub_plot SET sub_plot_status = 1 where sub_plot_id = #{subPlotId}
+    </update>
+	
+    <delete id="deleteTbSubPlotByIds" parameterType="String">
+        delete from tb_sub_plot where sub_plot_id in 
+        <foreach item="subPlotId" collection="array" open="(" separator="," close=")">
+            #{subPlotId}
+        </foreach>
+    </delete>
+
+    <select id="getSubPlotNumByPlotId" parameterType="Long" resultType="Long">
+        select count(*) num from tb_sub_plot where plot_id = #{plotId}
+    </select>
+
+    <select id="getSubPlotPersonNumByPlotId" parameterType="Long" resultType="Long">
+        select count(DISTINCT sub_plot_person) num from tb_sub_plot where plot_id = #{plotId} AND (!ISNULL(sub_plot_person))
+    </select>
+
+
+    <select id="getSubPlotNumberByPlotId" parameterType="Long" resultType="Long">
+        select count(*) num from tb_sub_plot where plot_id = #{plotId} AND sub_plot_status = 0
+    </select>
+<!--     根据农场ID 和子地块ID查询 是否存在 -->
+    <select id="selectByFarmIdAndSubPlotId" resultType="Long">
+        SELECT
+			count(1)
+		FROM
+			tb_farm t
+		INNER JOIN tb_plot t1 ON t.farm_id = t1.farm_id
+		INNER JOIN tb_sub_plot t2 ON t1.plot_id = t2.plot_id
+		WHERE
+			t.farm_status = 0
+		AND t1.plot_status = 0
+		AND t2.sub_plot_status = 0
+		AND t.farm_id=#{farmId}
+		AND t2.sub_plot_id=#{subPlotId}
+    </select>
+
+    <select id="selectByFarmIdAndUserCode" parameterType="map" resultMap="TbSubPlotResult">
+        select
+          tsp.sub_plot_id,
+          tsp.sub_plot_name,
+          tsp.sub_plot_person,
+          tsp.sub_plot_status,
+          tsp.sub_plot_acreage,
+          tsp.create_time,
+          tsp.create_by,
+          tsp.plot_id
+        from
+          tb_farm tf
+        inner join
+          tb_plot tp on tf.farm_id = tp.farm_id
+        inner join
+          tb_sub_plot tsp on tp.plot_id = tsp.plot_id
+        where
+          tf.farm_id = #{farmId} and tsp.sub_plot_person = #{userCode}
+    </select>
+
+</mapper>

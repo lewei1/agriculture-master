@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbSaleTempletInfoMapper">
+    
+    <resultMap type="TbSaleTempletInfo" id="TbSaleTempletInfoResult">
+        <result property="id"    column="id"    />
+        <result property="saleTempletId"    column="sale_templet_id"    />
+        <result property="name"    column="name"    />
+        <result property="link"    column="link"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+	
+	<sql id="selectTbSaleTempletInfoVo">
+        select id, sale_templet_id, name, link, img_url, type from tb_sale_templet_info
+    </sql>
+	
+    <select id="selectTbSaleTempletInfoList" parameterType="TbSaleTempletInfo" resultMap="TbSaleTempletInfoResult">
+        <include refid="selectTbSaleTempletInfoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="saleTempletId != null "> and sale_templet_id = #{saleTempletId}</if>
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="link != null  and link != '' "> and link = #{link}</if>
+             <if test="imgUrl != null  and imgUrl != '' "> and img_url = #{imgUrl}</if>
+             <if test="type != null "> and type = #{type}</if>
+         </where>
+         ORDER BY type,id
+    </select>
+    
+    <select id="selectTbSaleTempletInfoById" parameterType="Long" resultMap="TbSaleTempletInfoResult">
+        <include refid="selectTbSaleTempletInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbSaleTempletInfo" parameterType="TbSaleTempletInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_sale_templet_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="saleTempletId != null  ">sale_templet_id,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="link != null  and link != ''  ">link,</if>
+			<if test="imgUrl != null  and imgUrl != ''  ">img_url,</if>
+			<if test="type != null  ">type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="saleTempletId != null  ">#{saleTempletId},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="link != null  and link != ''  ">#{link},</if>
+			<if test="imgUrl != null  and imgUrl != ''  ">#{imgUrl},</if>
+			<if test="type != null  ">#{type},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbSaleTempletInfo" parameterType="TbSaleTempletInfo">
+        update tb_sale_templet_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="saleTempletId != null  ">sale_templet_id = #{saleTempletId},</if>
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="link != null  and link != ''  ">link = #{link},</if>
+            <if test="imgUrl != null  and imgUrl != ''  ">img_url = #{imgUrl},</if>
+            <if test="type != null  ">type = #{type},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbSaleTempletInfoById" parameterType="Long">
+        delete from tb_sale_templet_info where id = #{id}
+    </delete>
+    <delete id="deleteTbSaleTempletInfoBySaleTempletId" parameterType="Long">
+        delete from tb_sale_templet_info where sale_templet_id = #{saleTempletId}
+    </delete>
+    <delete id="deleteTbSaleTempletInfoByIds" parameterType="String">
+        delete from tb_sale_templet_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 批量插入展示模板详情-->
+   <insert id ="insertSaleTempletInfoBatch" parameterType="java.util.List" >
+         insert into tb_sale_templet_info
+         	(sale_templet_id, name, link,img_url,type)
+         values
+          <foreach collection ="list" item="ti" index= "index" separator =",">
+              (#{ti.saleTempletId}, #{ti.name},#{ti.link},#{ti.imgUrl},#{ti.type})
+          </foreach >
+   </insert >
+</mapper>

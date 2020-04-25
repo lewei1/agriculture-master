@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbArticleMapper">
+
+    <resultMap type="TbArticle" id="TbArticleResult">
+        <result property="materialId" column="material_id"/>
+        <result property="materialName" column="material_name"/>
+        <result property="materialTypeId" column="material_type_id"/>
+        <result property="materialTypeName" column="material_type_name"/>
+        <result property="brand" column="brand"/>
+        <result property="meterUnitId" column="meter_unit_id"/>
+        <result property="meterUnitName" column="meter_unit_name"/>
+        <result property="price" column="price"/>
+        <result property="priceUnitId" column="price_unit_id"/>
+        <result property="priceUnitName" column="price_unit_name"/>
+        <result property="unitId1" column="unit_id1"/>
+        <result property="unitName1" column="unit_name1"/>
+        <result property="conversionRatio1" column="conversion_ratio1"/>
+        <result property="unitId2" column="unit_id2"/>
+        <result property="unitName2" column="unit_name2"/>
+        <result property="conversionRatio2" column="conversion_ratio2"/>
+        <result property="multipleUnit" column="multiple_unit"/>
+        <result property="image" column="image"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="farmId" column="farm_id"/>
+        <result property="farmId" column="farm_id"/>
+    </resultMap>
+
+    <sql id="selectTbArticleVo">
+        select material_id, material_type_id, material_name, brand, meter_unit_id, price, price_unit_id, unit_id1, conversion_ratio1, unit_id2, conversion_ratio2, multiple_unit, image, create_time, create_by, update_time, update_by, farm_id from tb_article
+    </sql>
+
+    <sql id="selectTbArticleVo2">
+        SELECT
+        ta.material_id,
+        ta.material_name,
+        ta.material_type_id,
+        tat.type_name AS material_type_name,
+        ta.brand,
+        ta.meter_unit_id,
+        tut1.type_name AS meter_unit_name,
+        ta.price_unit_id,
+        tut2.type_name AS price_unit_name,
+        ta.unit_id1,
+        tut3.type_name AS unit_name1,
+        ta.conversion_ratio1,
+        ta.unit_id2,
+        tut4.type_name AS unit_name2,
+        ta.conversion_ratio2,
+        ta.multiple_unit,
+        ta.image,
+        ta.create_time,
+        ta.create_by,
+        ta.update_time,
+        ta.update_by,
+        ta.farm_id,
+        sum(tim.quantity) AS quantity,
+        ta.price,
+--         CASE WHEN ta.price_unit_id is null THEN ta.price
+--         WHEN ta.price_unit_id=ta.unit_id1 THEN ROUND(ta.price/ta.conversion_ratio1,2)
+--         WHEN ta.price_unit_id=ta.unit_id2 THEN ROUND(ta.price/ta.conversion_ratio2,2) END AS price,
+        CASE WHEN ta.price_unit_id is null THEN sum(tim.quantity) * ta.price
+        WHEN ta.price_unit_id=ta.unit_id1 THEN ROUND(sum(tim.quantity) * (ta.price/ta.conversion_ratio1),2)
+        WHEN ta.price_unit_id=ta.unit_id2 THEN ROUND(sum(tim.quantity) * (ta.price/ta.conversion_ratio2),2) END AS cost
+        FROM
+        tb_article ta
+        LEFT JOIN tb_article_type tat ON ta.material_type_id = tat.material_type_id
+        LEFT JOIN tb_unit_type tut1 ON ta.meter_unit_id = tut1.material_unit_id
+        LEFT JOIN tb_unit_type tut2 ON ta.price_unit_id = tut2.material_unit_id
+        LEFT JOIN tb_unit_type tut3 ON ta.unit_id1 = tut3.material_unit_id
+        LEFT JOIN tb_unit_type tut4 ON ta.unit_id2 = tut4.material_unit_id
+        LEFT JOIN tb_inventory_material tim ON ta.material_id = tim.material_id
+    </sql>
+
+    <select id="selectTbArticleList" parameterType="TbArticle" resultMap="TbArticleResult">
+        <include refid="selectTbArticleVo2"/>
+        <where>
+            <if test="materialId != null ">and ta.material_id = #{materialId}</if>
+            <if test="materialTypeId != null ">and ta.material_type_id = #{materialTypeId}</if>
+            <if test="materialName != null  and materialName != '' ">and ta.material_name = #{materialName}</if>
+            <if test="brand != null  and brand != '' ">and ta.brand = #{brand}</if>
+            <if test="meterUnitId != null ">and ta.meter_unit_id = #{meterUnitId}</if>
+            <if test="price != null ">and ta.price = #{price}</if>
+            <if test="priceUnitId != null ">and ta.price_unit_id = #{priceUnitId}</if>
+            <if test="unitId1 != null ">and ta.unit_id1 = #{unitId1}</if>
+            <if test="conversionRatio1 != null ">and ta.conversion_ratio1 = #{conversionRatio1}</if>
+            <if test="unitId2 != null ">and ta.unit_id2 = #{unitId2}</if>
+            <if test="conversionRatio2 != null ">and ta.conversion_ratio2 = #{conversionRatio2}</if>
+            <if test="multipleUnit != null ">and ta.multiple_unit = #{multipleUnit}</if>
+            <if test="image != null  and image != '' ">and ta.image = #{image}</if>
+            <if test="createTime != null ">and ta.create_time = #{createTime}</if>
+            <if test="createBy != null ">and ta.create_by = #{createBy}</if>
+            <if test="updateTime != null ">and ta.update_time = #{updateTime}</if>
+            <if test="updateBy != null ">and ta.update_by = #{updateBy}</if>
+            <if test="farmId != null  and farmId != '' ">and ta.farm_id = #{farmId}</if>
+        </where>
+        GROUP BY
+        ta.material_id
+        order by ta.create_time desc
+    </select>
+
+    <select id="selectTbArticleById" parameterType="TbArticle" resultMap="TbArticleResult">
+        <include refid="selectTbArticleVo2"/>
+        where ta.material_id = #{materialId} and ta.farm_id = #{farmId}
+    </select>
+
+    <insert id="insertTbArticle" parameterType="TbArticle" useGeneratedKeys="true" keyProperty="materialId">
+        insert into tb_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialTypeId != null  ">material_type_id,</if>
+            <if test="materialName != null  and materialName != ''  ">material_name,</if>
+            <if test="brand != null  and brand != ''  ">brand,</if>
+            <if test="meterUnitId != null  ">meter_unit_id,</if>
+            <if test="price != null  ">price,</if>
+            <if test="priceUnitId != null  ">price_unit_id,</if>
+            <if test="unitId1 != null  ">unit_id1,</if>
+            <if test="conversionRatio1 != null  ">conversion_ratio1,</if>
+            <if test="unitId2 != null  ">unit_id2,</if>
+            <if test="conversionRatio2 != null  ">conversion_ratio2,</if>
+            <if test="multipleUnit != null  ">multiple_unit,</if>
+            <if test="image != null  and image != ''  ">image,</if>
+            <if test="createTime != null  ">create_time,</if>
+            <if test="createBy != null  ">create_by,</if>
+            <if test="updateTime != null  ">update_time,</if>
+            <if test="updateBy != null  ">update_by,</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialTypeId != null  ">#{materialTypeId},</if>
+            <if test="materialName != null  and materialName != ''  ">#{materialName},</if>
+            <if test="brand != null  and brand != ''  ">#{brand},</if>
+            <if test="meterUnitId != null  ">#{meterUnitId},</if>
+            <if test="price != null  ">#{price},</if>
+            <if test="priceUnitId != null  ">#{priceUnitId},</if>
+            <if test="unitId1 != null  ">#{unitId1},</if>
+            <if test="conversionRatio1 != null  ">#{conversionRatio1},</if>
+            <if test="unitId2 != null  ">#{unitId2},</if>
+            <if test="conversionRatio2 != null  ">#{conversionRatio2},</if>
+            <if test="multipleUnit != null  ">#{multipleUnit},</if>
+            <if test="image != null  and image != ''  ">#{image},</if>
+            <if test="createTime != null  ">#{createTime},</if>
+            <if test="createBy != null  ">#{createBy},</if>
+            <if test="updateTime != null  ">#{updateTime},</if>
+            <if test="updateBy != null  ">#{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">#{farmId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTbArticle" parameterType="TbArticle">
+        update tb_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialTypeId != null  ">material_type_id = #{materialTypeId},</if>
+            <if test="materialName != null  and materialName != ''  ">material_name = #{materialName},</if>
+            <if test="brand != null  and brand != ''  ">brand = #{brand},</if>
+            <if test="price != null  ">price = #{price},</if>
+            <if test="priceUnitId != null  ">price_unit_id = #{priceUnitId},</if>
+            <!--<if test="meterUnitId != null  ">meter_unit_id = #{meterUnitId},</if>-->
+            <!--<if test="unitId1 != null  ">unit_id1 = #{unitId1},</if>-->
+            <!--<if test="unitId2 != null  ">unit_id2 = #{unitId2},</if>-->
+            <if test="conversionRatio1 != null  ">conversion_ratio1 = #{conversionRatio1},</if>
+            <if test="conversionRatio2 != null  ">conversion_ratio2 = #{conversionRatio2},</if>
+            <if test="multipleUnit != null  ">multiple_unit = #{multipleUnit},</if>
+            <if test="image != null  and image != ''  ">image = #{image},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="updateBy != null  ">update_by = #{updateBy},</if>
+            <if test="farmId != null  and farmId != ''  ">farm_id = #{farmId},</if>
+        </trim>
+        where material_id = #{materialId}
+    </update>
+
+    <delete id="deleteTbArticleById" parameterType="TbArticle">
+        delete from tb_article where material_id = #{materialId} and farm_id = #{farmId}
+    </delete>
+
+    <delete id="deleteTbArticleByIds" parameterType="String">
+        delete from tb_article where material_id in
+        <foreach item="materialId" collection="array" open="(" separator="," close=")">
+            #{materialId}
+        </foreach>
+    </delete>
+<!--     根据仓库ID查询物品 -->
+    <select id="selectByWarehouseId"  resultType="HashMap">
+		SELECT
+            ta.material_id AS materialId,
+            ta.material_name AS name,
+            ta.meter_unit_id AS meterUnitId,
+            tut1.type_name AS unit,
+            ta.price_unit_id AS priceUnitId,
+            tut2.type_name AS priceUnitName,
+            ta.unit_id1 AS unitId1,
+            tut3.type_name AS unit1,
+            ta.unit_id2 AS unitId2,
+            tut4.type_name AS unit2
+        FROM
+            tb_inventory_material t
+        INNER JOIN tb_article ta ON t.material_id = ta.material_id
+        AND t.warehouse_id = #{warehouseId}
+        LEFT JOIN tb_unit_type tut1 ON ta.meter_unit_id = tut1.material_unit_id
+        LEFT JOIN tb_unit_type tut2 ON ta.price_unit_id = tut2.material_unit_id
+        LEFT JOIN tb_unit_type tut3 ON ta.unit_id1 = tut3.material_unit_id
+        LEFT JOIN tb_unit_type tut4 ON ta.unit_id2 = tut4.material_unit_id
+    </select>
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zcy.agriculture.mapper.TbFarmingPlanImplementMapper">
+    
+    <resultMap type="TbFarmingPlanImplement" id="TbFarmingPlanImplementResult">
+        <result property="id"    column="id"    />
+        <result property="planId"    column="plan_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="thingsboardKey"    column="thingsboard_key"    />
+        <result property="conditionVar"    column="condition_var"    />
+        <result property="dataVar"    column="data_var"    />
+        <result property="status"    column="status"    />
+        
+    </resultMap>
+	
+	<sql id="selectTbFarmingPlanImplementVo">
+        select id, plan_id, dev_id, thingsboard_key, condition_var, data_var, status from tb_farming_plan_implement
+    </sql>
+	
+    <select id="selectTbFarmingPlanImplementList" parameterType="TbFarmingPlanImplement" resultMap="TbFarmingPlanImplementResult">
+        <include refid="selectTbFarmingPlanImplementVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="planId != null "> and plan_id = #{planId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="thingsboardKey != null and thingsboardKey != '' "> and thingsboard_key = #{thingsboardKey}</if>
+             <if test="conditionVar != null "> and condition_var = #{conditionVar}</if>
+             <if test="dataVar != null  and dataVar != '' "> and data_var = #{dataVar}</if>
+             <if test="status != null "> and status = #{status}</if>
+         </where>
+    </select>
+    
+    <select id="selectTbFarmingPlanImplementById" parameterType="Long" resultMap="TbFarmingPlanImplementResult">
+        <include refid="selectTbFarmingPlanImplementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTbFarmingPlanImplement" parameterType="TbFarmingPlanImplement">
+        insert into tb_farming_plan_implement
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="planId != null  ">plan_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="thingsboardKey != null  and thingsboardKey != '' ">thingsboard_key,</if>
+			<if test="conditionVar != null  ">condition_var,</if>
+			<if test="dataVar != null  and dataVar != ''  ">data_var,</if>
+			<if test="status != null  ">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="planId != null  ">#{planId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="thingsboardKey != null  and thingsboardKey != '' ">#{thingsboardKey},</if>
+			<if test="conditionVar != null  ">#{conditionVar},</if>
+			<if test="dataVar != null  and dataVar != ''  ">#{dataVar},</if>
+			<if test="status != null  ">#{status},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTbFarmingPlanImplement" parameterType="TbFarmingPlanImplement">
+        update tb_farming_plan_implement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planId != null  ">plan_id = #{planId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="thingsboardKey != null  and thingsboardKey != '' ">thingsboard_key = #{thingsboardKey},</if>
+            <if test="conditionVar != null  ">condition_var = #{conditionVar},</if>
+            <if test="dataVar != null  and dataVar != ''  ">data_var = #{dataVar},</if>
+            <if test="status != null  ">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTbFarmingPlanImplementById" parameterType="Long">
+        delete from tb_farming_plan_implement where id = #{id}
+    </delete>
+    <delete id="deleteTbFarmingPlanImplementByPlanId" parameterType="Long">
+        delete from tb_farming_plan_implement where plan_id = #{planId}
+    </delete>
+	
+    <delete id="deleteTbFarmingPlanImplementByIds" parameterType="String">
+        delete from tb_farming_plan_implement where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+<!--     查询未调用过的  且在传入的时间 是 在开启到结束时间内的  智能计划 -->
+    <select id="selectByIntelligentPlanningList"  resultType="org.zcy.agriculture.vo.TbFarmingPlanImplementVo">
+        SELECT
+			t.plan_id AS planId,
+			t1.dev_id AS devId,
+			t1.id,
+			t1.`status`,
+			t1.thingsboard_key AS thingsboardKey,
+			t1.condition_var AS conditionVar,
+			t1.data_var AS dataVar,
+			t.plan_repeat AS planRepeat,
+			t.plan_repeat_data AS planRepeatData,
+			t.start_time AS startTime,
+			t.end_time AS endTime
+		FROM
+			tb_farming_plan t
+		INNER JOIN tb_farming_plan_implement t1 ON t.plan_id = t1.plan_id
+		AND t.plan_id IN (
+			SELECT
+				t2.plan_id
+			FROM
+				tb_plan_plot t2
+			INNER JOIN tb_sub_plot t3 ON t2.sub_plot_id = t3.sub_plot_id AND t3.sub_plot_status = 0
+			INNER JOIN tb_plot t4 ON t4.plot_id = t3.plot_id AND t4.plot_status = 0 
+		)
+		WHERE
+			t.is_lntelligence = 1
+		AND t.plan_status = 0
+		<if test="type == 1  "> AND STR_TO_DATE(#{today},'%Y-%m-%d %H:%i:%s') >= t.start_time AND t.end_time >= STR_TO_DATE(#{today},'%Y-%m-%d %H:%i:%s')</if>
+		<if test="type == 2  "> AND STR_TO_DATE(#{today},'%Y-%m-%d %H:%i:%s') >= t.end_time AND t.plan_repeat=1 </if>
+    </select>
+</mapper>

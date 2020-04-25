@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    
+    <title>溯源运营后台</title>
+    <meta name="keywords" content="溯源运营后台">
+    <meta name="description" content="溯源运营后台">
+    <link href="../static/css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/style.css" th:href="@{css/style.css}" rel="stylesheet"/>
+    <link href="../static/css/login.min.css" th:href="@{css/login.min.css}" rel="stylesheet"/>
+    <link href="../static/numberone/css/ry-ui.css" th:href="@{/numberone/css/ry-ui.css?v=3.2.0}" rel="stylesheet"/>
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="../static/favicon.ico" th:href="@{favicon.ico}"/>
+    <style type="text/css">label.error { position:inherit;  }</style>
+    <script>
+        if(window.top!==window.self){window.top.location=window.location};
+    </script>
+
+    <style>
+        @media screen and (min-width: 1366px) {
+            html {
+                font-size: 71.1px;
+            }
+        }
+        @media screen and (min-width: 1440px) {
+            html {
+                font-size: 75px;
+            }
+        }
+        @media screen and (min-width: 1600px) {
+            html {
+                font-size: 83.3px;
+            }
+        }
+        @media screen and (min-width: 1920px) {
+            html {
+                font-size: 100px;
+            }
+        }
+        @media screen and (min-width: 3840px) {
+            html {
+                font-size: 200px;
+            }
+        }
+        body {
+            font-size: 0.12rem;
+            /* min-height: 768px;
+            min-width: 1366px; */
+        }
+        body,
+        div {
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: url("./img/login-background.jpg");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            overflow: hidden;
+        }
+        .content .login-img {
+            position: absolute;
+            width: 6.7rem;
+            height: 5.13rem;
+            top: 3.13rem;
+            left: 2.49rem;
+            background: url("./numberone.png");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        .content .login-cont {
+            position: absolute;
+            width: 3.54rem;
+            height: 3.8rem;
+            top: 2.3rem;
+            right: 2.75rem;
+            padding: 0.7rem 0.45rem;
+            background: url("./img/beijing2.png");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        .content .login-cont .item,
+        .content .login-cont .item1 {
+            position: relative;
+            width: 100%;
+            height: 0.52rem;
+            margin-bottom: 0.35rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .content .login-cont .item1 {
+            margin-bottom:0.15rem;
+        }
+        .content .login-cont .item .validate {
+            width: 1.51rem;
+            height: 100%;
+            text-indent: 0.25rem;
+        }
+        .content .login-cont .item input {
+            width: 100%;
+            height: 0.52rem;
+            background: RGB(77,102,134,0.5);
+            border: none;
+            box-sizing: border-box;
+            border-radius: 0.05rem;
+            text-indent: 0.43rem;
+            color: #C4C3C3;
+            font-size: 0.16rem;
+            letter-spacing: 0.01rem;
+        }
+        .content .login-cont .item .box1 {
+            width: 0.17rem;
+            height: 0.17rem;
+        }
+        .content .login-cont .item img {
+            position: absolute;
+            width: 0.2rem;
+            height: 0.2rem;
+            top: 0.14rem;
+            left: 0.13rem;
+        }
+        .content .login-cont .item .img {
+            position: relative;
+            top: 0.05rem;
+            width: 1.05rem;
+            height: 0.43rem;
+        }
+        .content .login-cont .item .change {
+            color: #367FA9;
+            line-height: 0.52rem;
+            cursor: pointer;
+        }
+        .content .login-cont .item1 .txt {
+            width: 100%;
+            height: 100%;
+            line-height: 0.52rem;
+            text-align: center;
+            color: #FFFFFF;
+            font-size: 0.18rem;
+            background: #3C8DBC;
+            border-radius: 0.05rem;
+            font-weight: bold;
+            letter-spacing: 0.02rem;
+            cursor: pointer;
+        }
+        .content .login-cont .item .txt1 {
+            color: #587596;
+            font-size: 0.14rem;
+            cursor: pointer;
+        }
+        .content .login-cont .item input::-webkit-input-placeholder{
+            color:#C4C3C3;
+        }
+
+
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: inherit;
+        }
+    </style>
+</head>
+
+<body class="content">
+    <div class="login-img"></div>
+    <div class="login-cont">
+
+        <form id="signupForm">
+        <div class="item">
+            <img src="./img/login1.svg" alt="">
+            <input name="username" type="text" class="item-input uname" placeholder="用户名/手机号" value="admin"/>
+        </div>
+        <div class="item">
+            <img src="./img/login2.svg" alt="">
+            <input name="password" type="password" class="item-input pword" placeholder="密码"value="admin123" autocomplete="off"/>
+        </div>
+        <div class="item">
+            <input type="text" name="validateCode" class="validate code" placeholder="验证码" maxlength="5" autocomplete="off">
+            <a href="javascript:void(0);" title="点击更换验证码">
+                <img th:src="@{captcha/captchaImage(type=${captchaType})}" class="img imgcode" width="85%"/>
+            </a>
+            <div class="change" id='changeloginImg'>换一组</div>
+        </div>
+        <div class="item1">
+            <button class="txt" style="border: 0px;" id="btnSubmit" data-loading="正在验证登录，请稍后...">登录</button>
+        </div>
+        <div class="item" style="justify-content:left ">
+            <input type="checkbox" id="rememberme" name="rememberme" class="box1" style="margin:2px 3px">
+            <div class="txt" style="line-height: 0.2rem;color:#587596">下次自动登录</div>
+        </div>
+        </form>
+    </div>
+    <script>
+const dom = document.getElementsByTagName('html');
+    dom[0].style['fontSize'] = (window.innerWidth >= 1366 ? window.innerWidth : 1366) / 1920 * 100 + 'px';
+    window.addEventListener('resize', () => {
+      const dom = document.getElementsByTagName('html');
+      dom[0].style['fontSize'] = (window.innerWidth >= 1366 ? window.innerWidth : 1366) / 1920 * 100 + 'px';
+    });</script>
+<script th:inline="javascript"> var ctx = [[@{/}]]; var captchaType = [[${captchaType}]]; </script>
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<script src="../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<!-- 验证插件 -->
+<script src="../static/ajax/libs/validate/jquery.validate.min.js" th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
+<script src="../static/ajax/libs/validate/messages_zh.min.js" th:src="@{/ajax/libs/validate/messages_zh.min.js}"></script>
+<script src="../static/ajax/libs/layer/layer.min.js" th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script src="../static/ajax/libs/blockUI/jquery.blockUI.js" th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script src="../static/numberone/js/ry-ui.js" th:src="@{/numberone/js/ry-ui.js?v=3.2.0}"></script>
+<script src="../static/numberone/login.js" th:src="@{/numberone/login.js}"></script>
+</body>
+</html>

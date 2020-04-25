@@ -1,0 +1,85 @@
+package org.zcy.agriculture.mapper;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.zcy.agriculture.entity.TbPlanPlot;
+
+/**
+ * 计划对应的地块 数据层
+ * 
+ * @author numberone
+ * @date 2019-07-01
+ */
+public interface TbPlanPlotMapper {
+	/**
+	 * 查询计划对应的地块信息
+	 * 
+	 * @param planPlotId 计划对应的地块ID
+	 * @return 计划对应的地块信息
+	 */
+	public TbPlanPlot selectTbPlanPlotById(Long planPlotId);
+
+	/**
+	 * 查询计划对应的地块列表
+	 * 
+	 * @param tbPlanPlot 计划对应的地块信息
+	 * @return 计划对应的地块集合
+	 */
+	public List<TbPlanPlot> selectTbPlanPlotList(TbPlanPlot tbPlanPlot);
+
+	/**
+	 * 新增计划对应的地块
+	 * 
+	 * @param tbPlanPlot 计划对应的地块信息
+	 * @return 结果
+	 */
+	public int insertTbPlanPlot(TbPlanPlot tbPlanPlot);
+
+	/**
+	 * 批量新增计划对应的地块
+	 * 
+	 * @param tbPlanPlot
+	 * @return
+	 */
+	public int insertBatchTbPlanPlot(List<TbPlanPlot> list);
+
+	/**
+	 * 根据计划ID复制数据
+	 * 
+	 * @param tbPlanPlot
+	 * @return
+	 */
+	public int copyPlanPloat(@Param("planId") Long planId, @Param("newPlanId") Long newPlanId, @Param("subPlotId") Long subPlotId);
+
+	/**
+	 * 修改计划对应的地块
+	 * 
+	 * @param tbPlanPlot 计划对应的地块信息
+	 * @return 结果
+	 */
+	public int updateTbPlanPlot(TbPlanPlot tbPlanPlot);
+
+	/**
+	 * 删除计划对应的地块
+	 * 
+	 * @param planPlotId 计划对应的地块ID
+	 * @return 结果
+	 */
+	public int deleteTbPlanPlotById(Long planPlotId);
+
+	/**
+	 * 批量删除计划对应的地块
+	 * 
+	 * @param planPlotIds 需要删除的数据ID
+	 * @return 结果
+	 */
+	public int deleteTbPlanPlotByIds(String[] planPlotIds);
+	/**
+	 * 根据农事计划ID查询 地块ID
+	 * @param planId
+	 * @return
+	 */
+	public List<HashMap<String,Object>> selectByPlanIdGetPlotId(Long planId);
+}
